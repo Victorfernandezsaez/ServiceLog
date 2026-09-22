@@ -37,9 +37,12 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.navigation.compose)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
+    implementation(libs.transportation.consumer)
     ksp(libs.room.compiler)
     implementation("androidx.compose.material:material-icons-core")
     implementation("androidx.compose.material:material-icons-extended")
