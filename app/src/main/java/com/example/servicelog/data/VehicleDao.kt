@@ -13,4 +13,7 @@ interface VehicleDao {
 
     @Delete
     suspend fun delete(vehicle: VehicleEntity)
+
+    @Insert
+    suspend fun insertReturningId(vehicle: VehicleEntity): Long
 }

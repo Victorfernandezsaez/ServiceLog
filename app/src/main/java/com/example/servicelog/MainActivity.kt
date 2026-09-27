@@ -4,7 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,7 +23,13 @@ import com.example.servicelog.ui.Navigation
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.*
 import androidx.compose.runtime.getValue
+import androidx.core.os.LocaleListCompat
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import com.example.servicelog.ui.HistoryScreen
 import com.example.servicelog.ui.HomeScreen
+import com.example.servicelog.ui.MaintenanceFormScreen
+import com.example.servicelog.ui.MaintenanceViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,9 +49,17 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun AppNavigation(viewModel: VehicleViewModel = viewModel()) {
+fun AppNavigation(
+    viewModel: VehicleViewModel = viewModel(),
+    maintenanceViewModel: MaintenanceViewModel = viewModel()
+) {
     val navController = rememberNavController()
     val vehicle by viewModel.vehicle.collectAsStateWithLifecycle()
+    val entries by maintenanceViewModel.entries.collectAsStateWithLifecycle()
+
+    LaunchedEffect(vehicle?.id) {
+        vehicle?.id?.let { maintenanceViewModel.setVehicle(it) }
+    }
 
     val backStack by navController.currentBackStackEntryAsState()
     val currentRoute = backStack?.destination?.route
@@ -67,6 +84,13 @@ fun AppNavigation(viewModel: VehicleViewModel = viewModel()) {
                     }
                 }
             }
+        },
+        floatingActionButton = {
+            if (currentRoute == Navigation.HOME.route && vehicle != null) {
+                FloatingActionButton(onClick = { navController.navigate("maintenanceForm") }) {
+                    Icon(Icons.Filled.Add, contentDescription = "Add entry")
+                }
+            }
         }
     ) { padding ->
         NavHost(
@@ -81,6 +105,7 @@ fun AppNavigation(viewModel: VehicleViewModel = viewModel()) {
                     onEditClick = { navController.navigate("vehicleForm") }
                 )
             }
+
             composable("vehicleForm") {
                 FormScreen(
                     vehicleToEdit = vehicle,
@@ -91,8 +116,67 @@ fun AppNavigation(viewModel: VehicleViewModel = viewModel()) {
                     onCancelClick = { navController.popBackStack() }
                 )
             }
-            composable(Navigation.HISTORY.route) { PlaceholderScreen("History") }
+
+            composable("maintenanceForm") {
+                MaintenanceFormScreen(
+                    entryToEdit = null,
+                    vehicleId = vehicle?.id ?: 0,
+                    onSave = { navController.popBackStack() },
+                    onCancel = { navController.popBackStack() }
+                )
+            }
+
+            composable(Navigation.HISTORY.route) {
+                HistoryScreen(
+                    entries = entries,
+                    onEntryClick = { navController.navigate("maintenanceForm/${it.id}") }
+                )
+            }
+
+            composable("maintenanceForm") {
+                MaintenanceFormScreen(
+                    entryToEdit = null,
+                    vehicleId = vehicle?.id ?: 0,
+                    onSave = { entry ->
+                        maintenanceViewModel.save(entry)
+                        val km = entry.mileage
+                        val v = vehicle
+                        if (km != null && v != null && km > v.currentKm) {
+                            viewModel.save(v.copy(currentKm = km))
+                        }
+                        navController.popBackStack()
+                    },
+                    onCancel = { navController.popBackStack() }
+                )
+            }
+
+            composable(
+                route = "maintenanceForm/{entryId}",
+                arguments = listOf(navArgument("entryId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val entryId = backStackEntry.arguments?.getLong("entryId") ?: 0L
+                val entry = entries.find { it.id == entryId }
+                MaintenanceFormScreen(
+                    entryToEdit = entry,
+                    vehicleId = vehicle?.id ?: 0,
+                    onSave = { entry ->
+                        maintenanceViewModel.save(entry)
+                        val km = entry.mileage
+                        val v = vehicle
+                        if (km != null && v != null && km > v.currentKm) {
+                            viewModel.save(v.copy(currentKm = km))
+                        }
+                        navController.popBackStack()
+                    },
+                    onCancel = { navController.popBackStack() },
+                    onDelete = {
+                        entry?.let { maintenanceViewModel.delete(it) }
+                        navController.popBackStack()
+                    }                )
+            }
+
             composable(Navigation.INTERVALS.route) { PlaceholderScreen("Intervals") }
+
             composable(Navigation.COSTS.route) { PlaceholderScreen("Costs") }
         }
     }

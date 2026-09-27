@@ -1,6 +1,7 @@
 package com.example.servicelog.ui
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -10,7 +11,7 @@ enum class Navigation(
     val icon: ImageVector
 ) {
     HOME("home", "Home", Icons.Filled.Home),
-    HISTORY("history", "History", Icons.Filled.List),
+    HISTORY("history", "History", Icons.AutoMirrored.Filled.List),
     INTERVALS("intervals", "Intervals", Icons.Filled.Schedule),
     COSTS("costs", "Costs", Icons.Filled.Euro)
 }

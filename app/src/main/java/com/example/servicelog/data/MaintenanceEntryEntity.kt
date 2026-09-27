@@ -25,5 +25,5 @@ data class MaintenanceEntryEntity(
     val costCents: Int?,
     val workshop: String?,
     val notes: String?,
-    val photoUri: String?
+    val photoUri: String? = null
 )

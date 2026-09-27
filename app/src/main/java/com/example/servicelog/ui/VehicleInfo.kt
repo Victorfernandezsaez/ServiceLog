@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -37,19 +38,26 @@ fun VehicleInfo(vehicle: Vehicle) {
                 .padding(24.dp),
             contentAlignment = Alignment.Center
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = vehicle.type.icon,
-                    contentDescription = vehicle.type.label,
-                    modifier = Modifier.size(32.dp)
-                )
-                Spacer(modifier = Modifier.width(16.dp))
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = vehicle.type.icon,
+                        contentDescription = vehicle.type.label,
+                        modifier = Modifier.size(32.dp)
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(
+                        text = listOf(vehicle.alias, vehicle.brand, vehicle.model)
+                            .filter { it.isNotBlank() }
+                            .joinToString(" "),
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Spacer(Modifier.height(4.dp))
                 Text(
-                    text = listOf(vehicle.alias, vehicle.brand, vehicle.model)
-                        .filter { it.isNotBlank() }
-                        .joinToString(" "),
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
+                    text = "${numberFormat.format(vehicle.currentKm)} km",
+                    fontSize = 14.sp
                 )
             }
         }
