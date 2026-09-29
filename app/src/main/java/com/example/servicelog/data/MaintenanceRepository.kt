@@ -15,11 +15,31 @@ class MaintenanceRepository(private val dao: MaintenanceDao) {
 }
 
 private fun MaintenanceEntryEntity.toDomain() = MaintenanceEntry(
-    id, vehicleId, title, category, date, dateIsApproximate,
-    mileage, costCents, workshop, notes, photoUri
+    id = id,
+    vehicleId = vehicleId,
+    title = title,
+    category = category,
+    date = date,
+    dateIsApproximate = dateIsApproximate,
+    mileage = mileage,
+    costCents = costCents,
+    workshop = workshop,
+    notes = notes,
+    photoUri = photoUri,
+    intervalId = intervalId
 )
 
 private fun MaintenanceEntry.toEntity() = MaintenanceEntryEntity(
-    id, vehicleId, title, category, date, dateIsApproximate,
-    mileage, costCents, workshop, notes, photoUri
+    id = id,
+    vehicleId = vehicleId,
+    title = title,
+    category = category,
+    date = date,
+    dateIsApproximate = dateIsApproximate,
+    mileage = mileage,
+    costCents = costCents,
+    workshop = workshop,
+    notes = notes,
+    photoUri = photoUri,
+    intervalId = intervalId
 )

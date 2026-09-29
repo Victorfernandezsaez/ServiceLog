@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -23,13 +22,17 @@ import com.example.servicelog.ui.Navigation
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.*
 import androidx.compose.runtime.getValue
-import androidx.core.os.LocaleListCompat
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.example.servicelog.domain.calculateDue
 import com.example.servicelog.ui.HistoryScreen
 import com.example.servicelog.ui.HomeScreen
+import com.example.servicelog.ui.IntervalFormScreen
+import com.example.servicelog.ui.IntervalViewModel
+import com.example.servicelog.ui.IntervalsScreen
 import com.example.servicelog.ui.MaintenanceFormScreen
 import com.example.servicelog.ui.MaintenanceViewModel
+import java.time.LocalDate
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,19 +54,31 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppNavigation(
     viewModel: VehicleViewModel = viewModel(),
-    maintenanceViewModel: MaintenanceViewModel = viewModel()
+    maintenanceViewModel: MaintenanceViewModel = viewModel(),
+    intervalViewModel: IntervalViewModel = viewModel()
 ) {
     val navController = rememberNavController()
     val vehicle by viewModel.vehicle.collectAsStateWithLifecycle()
     val entries by maintenanceViewModel.entries.collectAsStateWithLifecycle()
+    val intervals by intervalViewModel.intervals.collectAsStateWithLifecycle()
 
     LaunchedEffect(vehicle?.id) {
-        vehicle?.id?.let { maintenanceViewModel.setVehicle(it) }
+        vehicle?.id?.let {
+            maintenanceViewModel.setVehicle(it)
+            intervalViewModel.setVehicle(it)
+        }
     }
 
     val backStack by navController.currentBackStackEntryAsState()
     val currentRoute = backStack?.destination?.route
     val showBar = Navigation.entries.any { it.route == currentRoute }
+
+    val dueStatuses = remember(intervals, entries, vehicle) {
+        intervals
+            .map { calculateDue(it, entries, LocalDate.now(), vehicle?.currentKm) }
+            .sortedBy { it.urgency.ordinal }
+    }
+
 
     Scaffold(
         bottomBar = {
@@ -85,13 +100,26 @@ fun AppNavigation(
                 }
             }
         },
+
         floatingActionButton = {
-            if (currentRoute == Navigation.HOME.route && vehicle != null) {
-                FloatingActionButton(onClick = { navController.navigate("maintenanceForm") }) {
-                    Icon(Icons.Filled.Add, contentDescription = "Add entry")
+            when (currentRoute) {
+                Navigation.HOME.route -> {
+                    if (vehicle != null) {
+                        FloatingActionButton(onClick = { navController.navigate("maintenanceForm") }) {
+                            Icon(Icons.Filled.Add, contentDescription = "Add entry")
+                        }
+                    }
+                }
+                Navigation.INTERVALS.route -> {
+                    if (vehicle != null) {
+                        FloatingActionButton(onClick = { navController.navigate("intervalForm") }) {
+                            Icon(Icons.Filled.Add, contentDescription = "Add interval")
+                        }
+                    }
                 }
             }
         }
+
     ) { padding ->
         NavHost(
             navController = navController,
@@ -101,6 +129,7 @@ fun AppNavigation(
             composable(Navigation.HOME.route) {
                 HomeScreen(
                     vehicle = vehicle,
+                    dueStatuses = dueStatuses,
                     onAddClick = { navController.navigate("vehicleForm") },
                     onEditClick = { navController.navigate("vehicleForm") }
                 )
@@ -175,7 +204,46 @@ fun AppNavigation(
                     }                )
             }
 
-            composable(Navigation.INTERVALS.route) { PlaceholderScreen("Intervals") }
+            composable(Navigation.INTERVALS.route) {
+                IntervalsScreen(
+                    intervals = intervals,
+                    onIntervalClick = { navController.navigate("intervalForm/${it.id}") },
+                    onAddClick = { navController.navigate("intervalForm") }
+                )
+            }
+
+            composable("intervalForm") {
+                IntervalFormScreen(
+                    intervalToEdit = null,
+                    vehicleId = vehicle?.id ?: 0,
+                    onSave = {
+                        intervalViewModel.save(it)
+                        navController.popBackStack()
+                    },
+                    onCancel = { navController.popBackStack() }
+                )
+            }
+
+            composable(
+                route = "intervalForm/{intervalId}",
+                arguments = listOf(navArgument("intervalId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val intervalId = backStackEntry.arguments?.getLong("intervalId") ?: 0L
+                val interval = intervals.find { it.id == intervalId }
+                IntervalFormScreen(
+                    intervalToEdit = interval,
+                    vehicleId = vehicle?.id ?: 0,
+                    onSave = {
+                        intervalViewModel.save(it)
+                        navController.popBackStack()
+                    },
+                    onCancel = { navController.popBackStack() },
+                    onDelete = {
+                        interval?.let { intervalViewModel.delete(it) }
+                        navController.popBackStack()
+                    }
+                )
+            }
 
             composable(Navigation.COSTS.route) { PlaceholderScreen("Costs") }
         }

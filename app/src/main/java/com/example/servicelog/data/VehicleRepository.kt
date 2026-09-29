@@ -13,9 +13,25 @@ class VehicleRepository(private val dao: VehicleDao) {
 }
 
 private fun VehicleEntity.toDomain() = Vehicle(
-    id, type, alias, brand, model, year, typeOfFuel, tankCapacity, currentKm
+    id = id,
+    type = type,
+    alias = alias,
+    brand = brand,
+    model = model,
+    year = year,
+    typeOfFuel = typeOfFuel,
+    tankCapacity = tankCapacity,
+    currentKm = currentKm
 )
 
 private fun Vehicle.toEntity() = VehicleEntity(
-    id, type, alias, brand, model, year, typeOfFuel, tankCapacity, currentKm
+    id = id,
+    type = type,
+    alias = alias,
+    brand = brand,
+    model = model,
+    year = year,
+    typeOfFuel = typeOfFuel,
+    tankCapacity = tankCapacity,
+    currentKm = currentKm
 )

@@ -16,6 +16,7 @@ import java.time.LocalDate
 )
 data class MaintenanceEntryEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val intervalId: Long? = null,
     val vehicleId: Long,
     val title: String,
     val category: Category,
