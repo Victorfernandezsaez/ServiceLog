@@ -32,6 +32,7 @@ import com.example.servicelog.ui.IntervalViewModel
 import com.example.servicelog.ui.IntervalsScreen
 import com.example.servicelog.ui.MaintenanceFormScreen
 import com.example.servicelog.ui.MaintenanceViewModel
+import com.example.servicelog.ui.UpdateMileageDialog
 import java.time.LocalDate
 
 class MainActivity : ComponentActivity() {
@@ -79,6 +80,7 @@ fun AppNavigation(
             .sortedBy { it.urgency.ordinal }
     }
 
+    var showMileageDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         bottomBar = {
@@ -120,6 +122,7 @@ fun AppNavigation(
             }
         }
 
+
     ) { padding ->
         NavHost(
             navController = navController,
@@ -131,7 +134,9 @@ fun AppNavigation(
                     vehicle = vehicle,
                     dueStatuses = dueStatuses,
                     onAddClick = { navController.navigate("vehicleForm") },
-                    onEditClick = { navController.navigate("vehicleForm") }
+                    onEditClick = { navController.navigate("vehicleForm") },
+                    onUpdateMileage = { showMileageDialog = true }
+
                 )
             }
 
@@ -247,6 +252,18 @@ fun AppNavigation(
 
             composable(Navigation.COSTS.route) { PlaceholderScreen("Costs") }
         }
+    }
+
+    val v = vehicle
+    if (showMileageDialog && v != null) {
+        UpdateMileageDialog(
+            currentKm = v.currentKm,
+            onConfirm = { km ->
+                viewModel.save(v.copy(currentKm = km, lastReadingDate = LocalDate.now()))
+                showMileageDialog = false
+            },
+            onDismiss = { showMileageDialog = false }
+        )
     }
 }
 

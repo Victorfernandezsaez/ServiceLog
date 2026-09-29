@@ -3,6 +3,7 @@ package com.example.servicelog.data
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.servicelog.domain.VehicleType
+import java.time.LocalDate
 
 @Entity(tableName = "vehicle")
 data class VehicleEntity(
@@ -14,5 +15,7 @@ data class VehicleEntity(
     val year: Int?,
     val typeOfFuel: String,
     val tankCapacity: Int?,
-    val currentKm: Int
+    val currentKm: Int,
+    val lastReadingDate: LocalDate? = null
+
 )

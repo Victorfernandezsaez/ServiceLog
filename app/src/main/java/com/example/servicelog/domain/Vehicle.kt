@@ -1,5 +1,7 @@
 package com.example.servicelog.domain
 
+import java.time.LocalDate
+
 
 data class Vehicle(
     val id: Long = 0,
@@ -10,5 +12,6 @@ data class Vehicle(
     val year: Int?,
     val typeOfFuel: String,
     val tankCapacity: Int?,
-    val currentKm: Int
+    val currentKm: Int,
+    val lastReadingDate: LocalDate? = null
 )

@@ -38,6 +38,7 @@ fun HomeScreen(
     dueStatuses: List<DueStatus>,
     onAddClick: () -> Unit,
     onEditClick: () -> Unit,
+    onUpdateMileage: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -73,7 +74,7 @@ fun HomeScreen(
                     .fillMaxWidth()
                     .clickable { onEditClick() }
             ) {
-                VehicleInfo(vehicle, dueStatuses)
+                VehicleInfo(vehicle, dueStatuses, onUpdateMileage)
             }
         }
     }

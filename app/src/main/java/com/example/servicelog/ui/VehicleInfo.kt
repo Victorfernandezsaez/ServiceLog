@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +16,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,7 +32,11 @@ import com.example.servicelog.domain.DueStatus
 import com.example.servicelog.domain.Vehicle
 import com.example.servicelog.domain.icon
 @Composable
-fun VehicleInfo(vehicle: Vehicle, dueStatuses: List<DueStatus>) {
+fun VehicleInfo(
+    vehicle: Vehicle,
+    dueStatuses: List<DueStatus>,
+    onUpdateMileage: () -> Unit
+) {
 
     var expanded by remember { mutableStateOf(false) }
     val visible = if (expanded) dueStatuses else dueStatuses.take(4)
@@ -65,10 +71,17 @@ fun VehicleInfo(vehicle: Vehicle, dueStatuses: List<DueStatus>) {
                     )
                 }
                 Spacer(Modifier.height(4.dp))
-                Text(
-                    text = "${numberFormat.format(vehicle.currentKm)} km",
-                    fontSize = 14.sp
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("${numberFormat.format(vehicle.currentKm)} km", fontSize = 14.sp)
+                    Spacer(Modifier.width(8.dp))
+                    TextButton(
+                        onClick = onUpdateMileage,
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
+                    ) { Text("Update", fontSize = 12.sp) }
+                }
+                vehicle.lastReadingDate?.let {
+                    Text("as of ${it.format(dayFormatter)}", fontSize = 11.sp, color = Color.Gray)
+                }
             }
         }
         Box(

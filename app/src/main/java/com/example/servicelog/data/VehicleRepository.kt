@@ -21,7 +21,8 @@ private fun VehicleEntity.toDomain() = Vehicle(
     year = year,
     typeOfFuel = typeOfFuel,
     tankCapacity = tankCapacity,
-    currentKm = currentKm
+    currentKm = currentKm,
+    lastReadingDate = lastReadingDate
 )
 
 private fun Vehicle.toEntity() = VehicleEntity(
@@ -33,5 +34,6 @@ private fun Vehicle.toEntity() = VehicleEntity(
     year = year,
     typeOfFuel = typeOfFuel,
     tankCapacity = tankCapacity,
-    currentKm = currentKm
+    currentKm = currentKm,
+    lastReadingDate = lastReadingDate
 )

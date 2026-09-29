@@ -16,6 +16,7 @@ suspend fun seed(db: AppDatabase) {
             typeOfFuel = "Diesel",
             tankCapacity = 80,
             currentKm = 375529,
+            lastReadingDate = LocalDate.of(2026, 3, 10)
         )
     )
 
