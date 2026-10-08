@@ -25,12 +25,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.servicelog.domain.DueStatus
 import com.example.servicelog.domain.Vehicle
 import com.example.servicelog.domain.icon
+import com.example.servicelog.R
+
 @Composable
 fun VehicleInfo(
     vehicle: Vehicle,
@@ -72,15 +75,18 @@ fun VehicleInfo(
                 }
                 Spacer(Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("${numberFormat.format(vehicle.currentKm)} km", fontSize = 14.sp)
+                    Text(
+                        stringResource(R.string.mileage_km, numberFormat.format(vehicle.currentKm)),
+                        fontSize = 14.sp
+                    )
                     Spacer(Modifier.width(8.dp))
                     TextButton(
                         onClick = onUpdateMileage,
                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
-                    ) { Text("Update", fontSize = 12.sp) }
+                    ) { Text(stringResource(R.string.update), fontSize = 12.sp) }
                 }
                 vehicle.lastReadingDate?.let {
-                    Text("as of ${it.format(dayFormatter)}", fontSize = 11.sp, color = Color.Gray)
+                    Text(stringResource(R.string.mileage_as_of, it.format(dayFormatter)), fontSize = 11.sp, color = Color.Gray)
                 }
             }
         }
@@ -94,11 +100,11 @@ fun VehicleInfo(
                 .padding(16.dp)
         ) {
             Column {
-                Text("Next service", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.next_service), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(8.dp))
 
                 if (dueStatuses.isEmpty()) {
-                    Text("No intervals defined yet", fontSize = 13.sp)
+                    Text(stringResource(R.string.no_intervals_yet), fontSize = 13.sp)
                 } else {
                     visible.forEach { status ->
                         Row(
@@ -120,14 +126,14 @@ fun VehicleInfo(
                                     color = status.urgency.color()
                                 )
                                 status.lastText()?.let {
-                                    Text("Last: $it", fontSize = 11.sp, color = Color.Gray)
+                                    Text(stringResource(R.string.last_prefix, it), fontSize = 11.sp, color = Color.Gray)
                                 }
                             }
                         }
                     }
                     if (dueStatuses.size > 4) {
                         Text(
-                            text = if (expanded) "Show less" else "+${dueStatuses.size - 4} more",
+                            text = if (expanded) stringResource(R.string.show_less) else stringResource(R.string.show_more, dueStatuses.size - 4),
                             fontSize = 12.sp,
                             color = Color.Gray,
                             modifier = Modifier

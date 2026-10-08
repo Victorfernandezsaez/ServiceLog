@@ -23,6 +23,8 @@ import com.example.servicelog.domain.MaintenanceEntry
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.res.stringResource
+import com.example.servicelog.R
 
 private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
 
@@ -75,7 +77,7 @@ fun MaintenanceFormScreen(
                 .padding(16.dp)
         ) {
             Text(
-                text = if (entryToEdit == null) "New entry" else "Edit entry",
+                text = if (entryToEdit == null) stringResource(R.string.new_entry) else stringResource(R.string.edit_entry),
                 style = MaterialTheme.typography.headlineSmall
             )
 
@@ -84,10 +86,10 @@ fun MaintenanceFormScreen(
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it; titleError = false },
-                label = { Text("What was done? *") },
-                placeholder = { Text("e.g. Oil + filter change (10w40)") },
+                label = { Text(stringResource(R.string.what_was_done)) },
+                placeholder = { Text(stringResource(R.string.entry_title_placeholder)) },
                 isError = titleError,
-                supportingText = { if (titleError) Text("This field is required") },
+                supportingText = { if (titleError) Text(stringResource(R.string.field_required)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -98,7 +100,7 @@ fun MaintenanceFormScreen(
                 onValueChange = {},
                 readOnly = true,
                 enabled = false,
-                label = { Text("Category") },
+                label = { Text(stringResource(R.string.category_label)) },
                 trailingIcon = { Icon(Icons.Filled.ArrowDropDown, contentDescription = null) },
                 colors = OutlinedTextFieldDefaults.colors(
                     disabledTextColor = MaterialTheme.colorScheme.onSurface,
@@ -120,11 +122,11 @@ fun MaintenanceFormScreen(
                 value = date?.format(dateFormatter) ?: "",
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("Date") },
+                label = { Text(stringResource(R.string.date_label)) },
                 isError = dateOrMileageError,
                 trailingIcon = {
                     IconButton(onClick = { showDatePicker = true }) {
-                        Icon(Icons.Filled.DateRange, contentDescription = "Pick date")
+                        Icon(Icons.Filled.DateRange, contentDescription = stringResource(R.string.pick_date_desc))
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -132,7 +134,7 @@ fun MaintenanceFormScreen(
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(checked = dateApprox, onCheckedChange = { dateApprox = it })
-                Text("Approximate date")
+                Text(stringResource(R.string.approximate_date))
             }
 
             OutlinedTextField(
@@ -140,11 +142,11 @@ fun MaintenanceFormScreen(
                 onValueChange = { input ->
                     if (input.all { it.isDigit() }) { mileage = input; dateOrMileageError = false }
                 },
-                label = { Text("Mileage (km)") },
+                label = { Text(stringResource(R.string.mileage_km_label)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 isError = dateOrMileageError,
                 supportingText = {
-                    Text(if (dateOrMileageError) "Enter a date or a mileage" else "Date or mileage required")
+                    Text(if (dateOrMileageError) stringResource(R.string.date_or_mileage_error) else stringResource(R.string.date_or_mileage_required))
                 },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -154,8 +156,8 @@ fun MaintenanceFormScreen(
             OutlinedTextField(
                 value = cost,
                 onValueChange = { cost = it },
-                label = { Text("Cost (€)") },
-                placeholder = { Text("e.g. 89.50") },
+                label = { Text(stringResource(R.string.cost_label)) },
+                placeholder = { Text(stringResource(R.string.cost_placeholder)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -165,7 +167,7 @@ fun MaintenanceFormScreen(
             OutlinedTextField(
                 value = workshop,
                 onValueChange = { workshop = it },
-                label = { Text("Workshop") },
+                label = { Text(stringResource(R.string.workshop_label)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -174,7 +176,7 @@ fun MaintenanceFormScreen(
             OutlinedTextField(
                 value = notes,
                 onValueChange = { notes = it },
-                label = { Text("Notes") },
+                label = { Text(stringResource(R.string.notes_label)) },
                 minLines = 3,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -187,7 +189,7 @@ fun MaintenanceFormScreen(
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Delete entry")
+                    Text(stringResource(R.string.delete_entry))
                 }
             }
 
@@ -195,7 +197,7 @@ fun MaintenanceFormScreen(
 
             Row(modifier = Modifier.fillMaxWidth()) {
                 OutlinedButton(onClick = onCancel, modifier = Modifier.weight(1f)) {
-                    Text("Cancel")
+                     Text(stringResource(R.string.cancel))
                 }
                 Spacer(Modifier.width(16.dp))
                 Button(
@@ -226,7 +228,7 @@ fun MaintenanceFormScreen(
                         }
                     },
                     modifier = Modifier.weight(1f)
-                ) { Text("Save") }
+                ) { Text(stringResource(R.string.save)) }
             }
 
             Spacer(Modifier.height(24.dp))
@@ -266,10 +268,10 @@ fun MaintenanceFormScreen(
                             date = LocalDate.ofEpochDay(it / 86_400_000)
                         }
                         showDatePicker = false
-                    }) { Text("OK") }
+                    }) { Text(stringResource(R.string.ok)) }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showDatePicker = false }) { Text("Cancel") }
+                    TextButton(onClick = { showDatePicker = false }) { Text(stringResource(R.string.cancel)) }
                 }
             ) { DatePicker(state = state) }
         }
@@ -278,18 +280,19 @@ fun MaintenanceFormScreen(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Delete this entry?") },
-            text = { Text("This cannot be undone.") },
+            title = { Text(stringResource(R.string.delete_entry_title))
+            },
+            text = { Text(stringResource(R.string.cannot_be_undone)) },
             confirmButton = {
                 TextButton(
                     onClick = { showDeleteDialog = false; onDelete?.invoke() },
                     colors = ButtonDefaults.textButtonColors(
                         contentColor = MaterialTheme.colorScheme.error
                     )
-                ) { Text("Delete") }
+                ) { Text(stringResource(R.string.delete)) }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showDeleteDialog = false }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }

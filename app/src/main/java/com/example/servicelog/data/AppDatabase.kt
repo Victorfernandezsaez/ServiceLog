@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
         RefuelEntity::class,
         MaintenanceIntervalEntity::class
     ],
-    version = 4
+    version = 5
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {

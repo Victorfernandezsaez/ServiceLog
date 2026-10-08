@@ -3,6 +3,9 @@ package com.example.servicelog.ui
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import com.example.servicelog.R
 import com.example.servicelog.domain.DueStatus
 import com.example.servicelog.domain.Urgency
 import java.text.NumberFormat
@@ -29,23 +32,26 @@ fun Urgency.color(): Color = when (this) {
     Urgency.UNKNOWN -> MaterialTheme.colorScheme.outline
 }
 
+@Composable
 fun DueStatus.nextText(): String {
     val parts = buildList {
         monthsLeft?.let {
-            add(if (it < 0) "${-it} months overdue" else "in $it months")
+            add(if (it < 0) pluralStringResource(R.plurals.overdue_months, (-it).toInt(), (-it).toInt())
+            else pluralStringResource(R.plurals.due_in_months, it.toInt(), it.toInt()))
         }
         kmLeft?.let {
-            add(if (it < 0) "${numberFormat.format(-it)} km overdue"
-            else "in ${numberFormat.format(it)} km")
+            add(if (it < 0) stringResource(R.string.km_overdue, numberFormat.format(-it))
+            else stringResource(R.string.in_km, numberFormat.format(it)))
         }
     }
-    return if (parts.isEmpty()) "No data yet" else parts.joinToString(" · ")
+    return if (parts.isEmpty()) stringResource(R.string.no_data_yet) else parts.joinToString(" · ")
 }
 
+@Composable
 fun DueStatus.lastText(): String? {
     val parts = buildList {
         lastDate?.let { add(it.format(monthFormatter)) }
-        lastMileage?.let { add("${numberFormat.format(it)} km") }
+        lastMileage?.let { add(stringResource(R.string.mileage_km_format, numberFormat.format(it))) }
     }
     return if (parts.isEmpty()) null else parts.joinToString(" · ")
 }

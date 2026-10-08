@@ -5,8 +5,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.servicelog.R
 
 @Composable
 fun UpdateMileageDialog(
@@ -19,11 +21,11 @@ fun UpdateMileageDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Update mileage") },
+        title = { Text(stringResource(R.string.update_mileage)) },
         text = {
             Column {
                 Text(
-                    "Current: ${numberFormat.format(currentKm)} km",
+                    stringResource(R.string.current_mileage_format, numberFormat.format(currentKm)),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(Modifier.height(16.dp))
@@ -35,7 +37,7 @@ fun UpdateMileageDialog(
                             error = null
                         }
                     },
-                    label = { Text("New reading (km)") },
+                    label = { Text(stringResource(R.string.new_reading_label)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = error != null,
                     supportingText = { error?.let { Text(it) } },
@@ -45,17 +47,20 @@ fun UpdateMileageDialog(
             }
         },
         confirmButton = {
+            val enterANumber = stringResource(R.string.enter_a_number)
+            val cannotBeLower = stringResource(R.string.mileage_too_low)
             TextButton(onClick = {
                 val km = value.toIntOrNull()
                 when {
-                    km == null -> error = "Enter a number"
-                    km < currentKm -> error = "Cannot be lower than the current reading"
+                    km == null -> error = enterANumber
+                    km < currentKm -> error = cannotBeLower
                     else -> onConfirm(km)
                 }
-            }) { Text("Save") }
+            }) { Text(stringResource(R.string.save))
+            }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
         }
     )
 }

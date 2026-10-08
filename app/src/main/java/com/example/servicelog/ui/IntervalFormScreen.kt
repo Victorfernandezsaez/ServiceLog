@@ -12,8 +12,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.servicelog.R
 import com.example.servicelog.domain.Category
 import com.example.servicelog.domain.MaintenanceInterval
 import java.time.LocalDate
@@ -64,7 +66,7 @@ fun IntervalFormScreen(
                 .padding(16.dp)
         ) {
             Text(
-                text = if (intervalToEdit == null) "New interval" else "Edit interval",
+                text = if (intervalToEdit == null) stringResource(R.string.new_interval) else stringResource(R.string.edit_interval),
                 style = MaterialTheme.typography.headlineSmall
             )
 
@@ -73,10 +75,10 @@ fun IntervalFormScreen(
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it; titleError = false },
-                label = { Text("What needs doing? *") },
-                placeholder = { Text("e.g. Oil + filter change") },
+                label = { Text(stringResource(R.string.what_needs_doing)) },
+                placeholder = { Text(stringResource(R.string.interval_title_placeholder)) },
                 isError = titleError,
-                supportingText = { if (titleError) Text("This field is required") },
+                supportingText = { if (titleError) Text(stringResource(R.string.field_required)) },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -88,7 +90,7 @@ fun IntervalFormScreen(
                     onValueChange = {},
                     readOnly = true,
                     enabled = false,
-                    label = { Text("Category") },
+                    label = { Text(stringResource(R.string.category_label)) },
                     trailingIcon = { Icon(Icons.Filled.ArrowDropDown, contentDescription = null) },
                     colors = OutlinedTextFieldDefaults.colors(
                         disabledTextColor = MaterialTheme.colorScheme.onSurface,
@@ -107,7 +109,7 @@ fun IntervalFormScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            Text("How often?", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.how_often), style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(8.dp))
 
             Row(modifier = Modifier.fillMaxWidth()) {
@@ -116,8 +118,8 @@ fun IntervalFormScreen(
                     onValueChange = { input ->
                         if (input.all { it.isDigit() }) { months = input; intervalError = false }
                     },
-                    label = { Text("Months") },
-                    placeholder = { Text("12") },
+                    label = { Text(stringResource(R.string.months_label)) },
+                    placeholder = { Text(stringResource(R.string.months_placeholder)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = intervalError,
                     singleLine = true,
@@ -129,8 +131,8 @@ fun IntervalFormScreen(
                     onValueChange = { input ->
                         if (input.all { it.isDigit() }) { km = input; intervalError = false }
                     },
-                    label = { Text("Kilometres") },
-                    placeholder = { Text("10000") },
+                    label = { Text(stringResource(R.string.kilometres_label)) },
+                    placeholder = { Text(stringResource(R.string.km_placeholder)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = intervalError,
                     singleLine = true,
@@ -139,8 +141,8 @@ fun IntervalFormScreen(
             }
 
             Text(
-                text = if (intervalError) "Set months, kilometres, or both"
-                else "Set months, kilometres, or both. Whichever comes first wins.",
+                text = if (intervalError) stringResource(R.string.set_interval_error)
+                else stringResource(R.string.set_interval_hint),
                 style = MaterialTheme.typography.bodySmall,
                 color = if (intervalError) MaterialTheme.colorScheme.error
                 else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -149,9 +151,9 @@ fun IntervalFormScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            Text("Last done", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.last_done), style = MaterialTheme.typography.titleMedium)
             Text(
-                "Only used until a matching entry exists in your history.",
+                stringResource(R.string.last_done_hint),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -161,10 +163,10 @@ fun IntervalFormScreen(
                 value = refDate?.format(dayFormatter) ?: "",
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("Date") },
+                label = { Text(stringResource(R.string.date_label)) },
                 trailingIcon = {
                     IconButton(onClick = { showDatePicker = true }) {
-                        Icon(Icons.Filled.DateRange, contentDescription = "Pick date")
+                        Icon(Icons.Filled.DateRange, contentDescription = stringResource(R.string.pick_date_desc))
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -177,8 +179,8 @@ fun IntervalFormScreen(
                 onValueChange = { input ->
                     if (input.all { it.isDigit() }) refMileage = input
                 },
-                label = { Text("Mileage (km)") },
-                placeholder = { Text("370000") },
+                label = { Text(stringResource(R.string.mileage_km_label)) },
+                placeholder = { Text(stringResource(R.string.mileage_placeholder)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -187,7 +189,7 @@ fun IntervalFormScreen(
 
             Row(modifier = Modifier.fillMaxWidth()) {
                 OutlinedButton(onClick = onCancel, modifier = Modifier.weight(1f)) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
                 Spacer(Modifier.width(16.dp))
                 Button(
@@ -214,7 +216,7 @@ fun IntervalFormScreen(
                         }
                     },
                     modifier = Modifier.weight(1f)
-                ) { Text("Save") }
+                ) { Text(stringResource(R.string.save)) }
             }
 
             if (intervalToEdit != null && onDelete != null) {
@@ -225,7 +227,7 @@ fun IntervalFormScreen(
                         contentColor = MaterialTheme.colorScheme.error
                     ),
                     modifier = Modifier.fillMaxWidth()
-                ) { Text("Delete interval") }
+                ) { Text(stringResource(R.string.delete_interval)) }
             }
 
             Spacer(Modifier.height(24.dp))
@@ -261,10 +263,11 @@ fun IntervalFormScreen(
                         refDate = LocalDate.ofEpochDay(it / 86_400_000)
                     }
                     showDatePicker = false
-                }) { Text("OK") }
+                }) { Text(stringResource(R.string.ok)) }
             },
             dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) { Text("Cancel") }
+                TextButton(onClick = { showDatePicker = false }) { Text(stringResource(R.string.cancel))}
+
             }
         ) { DatePicker(state = state) }
     }
@@ -272,18 +275,20 @@ fun IntervalFormScreen(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Delete this interval?") },
-            text = { Text("This cannot be undone.") },
+            title = {Text(stringResource(R.string.delete_interval_title))}
+            ,
+            text = { Text(stringResource(R.string.cannot_be_undone))
+            },
             confirmButton = {
                 TextButton(
                     onClick = { showDeleteDialog = false; onDelete?.invoke() },
                     colors = ButtonDefaults.textButtonColors(
                         contentColor = MaterialTheme.colorScheme.error
                     )
-                ) { Text("Delete") }
+                ) { Text(stringResource(R.string.delete)) }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showDeleteDialog = false }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }

@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.servicelog.domain.calculateDue
+import com.example.servicelog.ui.AppViewModelFactory
 import com.example.servicelog.ui.HistoryScreen
 import com.example.servicelog.ui.HomeScreen
 import com.example.servicelog.ui.IntervalFormScreen
@@ -32,6 +33,7 @@ import com.example.servicelog.ui.IntervalViewModel
 import com.example.servicelog.ui.IntervalsScreen
 import com.example.servicelog.ui.MaintenanceFormScreen
 import com.example.servicelog.ui.MaintenanceViewModel
+import com.example.servicelog.ui.UiState
 import com.example.servicelog.ui.UpdateMileageDialog
 import java.time.LocalDate
 
@@ -54,14 +56,18 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AppNavigation(
-    viewModel: VehicleViewModel = viewModel(),
-    maintenanceViewModel: MaintenanceViewModel = viewModel(),
-    intervalViewModel: IntervalViewModel = viewModel()
+    viewModel: VehicleViewModel = viewModel(factory = AppViewModelFactory),
+    maintenanceViewModel: MaintenanceViewModel = viewModel(factory = AppViewModelFactory),
+    intervalViewModel: IntervalViewModel = viewModel(factory = AppViewModelFactory)
 ) {
     val navController = rememberNavController()
-    val vehicle by viewModel.vehicle.collectAsStateWithLifecycle()
-    val entries by maintenanceViewModel.entries.collectAsStateWithLifecycle()
-    val intervals by intervalViewModel.intervals.collectAsStateWithLifecycle()
+    val vehicleState by viewModel.vehicle.collectAsStateWithLifecycle()
+    val entriesState by maintenanceViewModel.entries.collectAsStateWithLifecycle()
+    val intervalsState by intervalViewModel.intervals.collectAsStateWithLifecycle()
+
+    val vehicle = (vehicleState as? UiState.Content)?.data
+    val entries = (entriesState as? UiState.Content)?.data ?: emptyList()
+    val intervals = (intervalsState as? UiState.Content)?.data ?: emptyList()
 
     LaunchedEffect(vehicle?.id) {
         vehicle?.id?.let {
@@ -79,6 +85,8 @@ fun AppNavigation(
             .map { calculateDue(it, entries, LocalDate.now(), vehicle?.currentKm) }
             .sortedBy { it.urgency.ordinal }
     }
+
+
 
     var showMileageDialog by remember { mutableStateOf(false) }
 
@@ -131,7 +139,7 @@ fun AppNavigation(
         ) {
             composable(Navigation.HOME.route) {
                 HomeScreen(
-                    vehicle = vehicle,
+                    vehicleState = vehicleState,
                     dueStatuses = dueStatuses,
                     onAddClick = { navController.navigate("vehicleForm") },
                     onEditClick = { navController.navigate("vehicleForm") },
@@ -174,9 +182,9 @@ fun AppNavigation(
                     onSave = { entry ->
                         maintenanceViewModel.save(entry)
                         val km = entry.mileage
-                        val v = vehicle
-                        if (km != null && v != null && km > v.currentKm) {
-                            viewModel.save(v.copy(currentKm = km))
+                        val vehicle = vehicle
+                        if (km != null && vehicle != null && km > vehicle.currentKm) {
+                            viewModel.save(vehicle.copy(currentKm = km))
                         }
                         navController.popBackStack()
                     },
@@ -196,9 +204,9 @@ fun AppNavigation(
                     onSave = { entry ->
                         maintenanceViewModel.save(entry)
                         val km = entry.mileage
-                        val v = vehicle
-                        if (km != null && v != null && km > v.currentKm) {
-                            viewModel.save(v.copy(currentKm = km))
+                        val vehicle = vehicle
+                        if (km != null && vehicle != null && km > vehicle.currentKm) {
+                            viewModel.save(vehicle.copy(currentKm = km))
                         }
                         navController.popBackStack()
                     },

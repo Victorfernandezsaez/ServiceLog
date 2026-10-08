@@ -1,6 +1,7 @@
 package com.example.servicelog.data
 
 import com.example.servicelog.domain.Category
+import com.example.servicelog.domain.FuelType
 import com.example.servicelog.domain.VehicleType
 import java.time.LocalDate
 
@@ -13,7 +14,7 @@ suspend fun seed(db: AppDatabase) {
             brand = "VW",
             model = "T4",
             year = 1996,
-            typeOfFuel = "Diesel",
+            fuelType = FuelType.DIESEL,
             tankCapacity = 80,
             currentKm = 375529,
             lastReadingDate = LocalDate.of(2026, 3, 10)

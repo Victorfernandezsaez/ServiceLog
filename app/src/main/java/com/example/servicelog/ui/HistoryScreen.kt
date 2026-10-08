@@ -14,6 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.servicelog.domain.MaintenanceEntry
+import androidx.compose.ui.res.stringResource
+import com.example.servicelog.R
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -23,13 +25,13 @@ fun HistoryScreen(
 ) {
     if (entries.isEmpty()) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("No entries yet", style = MaterialTheme.typography.bodyLarge)
+            Text(stringResource(R.string.no_entries_yet), style = MaterialTheme.typography.bodyLarge)
         }
         return
     }
 
     val grouped = entries.groupBy { entry ->
-        entry.date?.format(monthFormatter) ?: "No date"
+        entry.date?.format(monthFormatter) ?: stringResource(R.string.no_date)
     }
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -56,7 +58,7 @@ fun HistoryScreen(
                             }
                             entry.mileage?.let {
                                 if (isNotEmpty()) append(" · ")
-                                append("${numberFormat.format(it)} km")
+                                append(stringResource(R.string.mileage_km_format, numberFormat.format(it)))
                             }
                         })
                     },

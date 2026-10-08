@@ -2,6 +2,7 @@ package com.example.servicelog.ui
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.servicelog.data.AppDatabase
 import com.example.servicelog.data.MaintenanceRepository
@@ -11,16 +12,15 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class MaintenanceViewModel(app: Application) : AndroidViewModel(app) {
-
-    private val repo = MaintenanceRepository(AppDatabase.get(app).maintenanceDao())
-
+class MaintenanceViewModel(private val repo: MaintenanceRepository) : ViewModel() {
     private val vehicleId = MutableStateFlow<Long?>(null)
 
-    val entries: StateFlow<List<MaintenanceEntry>> = vehicleId
+    val entries: StateFlow<UiState<List<MaintenanceEntry>>> = vehicleId
         .filterNotNull()
         .flatMapLatest { repo.observeEntries(it) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+        .map<List<MaintenanceEntry>, UiState<List<MaintenanceEntry>>> { UiState.Content(it) }
+        .catch { emit(UiState.Error(it.message ?: "Unknown error")) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UiState.Loading)
 
     fun setVehicle(id: Long) { vehicleId.value = id }
 

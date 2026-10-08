@@ -20,6 +20,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import com.example.servicelog.R
 
 
 @Composable
@@ -34,16 +37,15 @@ fun IntervalsScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text("No intervals yet", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.no_intervals_yet), style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(8.dp))
             Text(
-                "Add a rule like \"Oil change every 12 months or 10,000 km\" " +
-                        "to see what's coming up on the home screen.",
+                stringResource(R.string.add_interval_hint),
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center
             )
             Spacer(Modifier.height(24.dp))
-            Button(onClick = onAddClick) { Text("Add interval") }
+            Button(onClick = onAddClick) { Text(stringResource(R.string.add_interval)) }
         }
         return
     }
@@ -61,10 +63,11 @@ fun IntervalsScreen(
     }
 }
 
+@Composable
 private fun describeInterval(i: MaintenanceInterval): String {
     val parts = buildList {
-        i.intervalMonths?.let { add("every $it months") }
-        i.intervalKm?.let { add("every ${numberFormat.format(it)} km") }
+        i.intervalMonths?.let { add(pluralStringResource(R.plurals.every_months, it, it)) }
+        i.intervalKm?.let { add(stringResource(R.string.every_km, numberFormat.format(it))) }
     }
-    return if (parts.isEmpty()) "No interval set" else parts.joinToString(" or ")
+    return if (parts.isEmpty()) stringResource(R.string.no_interval_set) else parts.joinToString(stringResource(R.string.interval_separator))
 }

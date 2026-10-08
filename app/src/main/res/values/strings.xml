@@ -1,3 +1,125 @@
 <resources>
     <string name="app_name">Service Log</string>
+
+    <!-- common -->
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="delete_entry">Delete entry</string>
+    <string name="delete_entry_title">Delete this entry?</string>
+    <string name="delete_interval">Delete interval</string>
+    <string name="delete_interval_title">Delete this interval?</string>
+    <string name="cannot_be_undone">This cannot be undone.</string>
+    <string name="mileage_km_format">%1$s km</string>
+    <string name="error_loading">Could not load data</string>
+
+    <!-- home -->
+    <string name="next_service">Next service</string>
+    <string name="no_intervals_yet">No intervals defined yet</string>
+    <string name="update">Update</string>
+    <string name="mileage_as_of">as of %1$s</string>
+    <string name="last_prefix">Last: %1$s</string>
+    <string name="show_less">Show less</string>
+    <string name="show_more">+%1$d more</string>
+    <string name="no_data_yet">No data yet</string>
+    <string name="add">Add</string>
+
+    <!-- forms -->
+    <string name="new_entry">New entry</string>
+    <string name="edit_entry">Edit entry</string>
+    <string name="what_was_done">What was done? *</string>
+    <string name="field_required">This field is required</string>
+    <string name="date_or_mileage_required">Date or mileage required</string>
+    <string name="mileage_km">Km</string>
+
+    <string name="about_your_vehicle">About your %1$s</string>
+    <string name="vehicle_type_label">Vehicle Type *</string>
+    <string name="alias_label">Alias</string>
+    <string name="alias_placeholder">e.g. Daily Driver, Family SUV</string>
+    <string name="brand_label">Brand *</string>
+    <string name="brand_placeholder">e.g. VW, Toyota, BMW</string>
+    <string name="model_label">Model *</string>
+    <string name="model_placeholder">e.g. Fiesta, Golf</string>
+    <string name="year_label">Year of fabrication</string>
+    <string name="only_numbers_error">Only numbers in this field</string>
+    <string name="only_numbers">Only numbers in this field</string>
+    <string name="year_placeholder">e.g. 2016</string>
+    <string name="fuel_type_label">Type of fuel</string>
+    <string name="fuel_type_placeholder">Select fuel type</string>
+    <string name="fuel_diesel">Diesel</string>
+    <string name="fuel_gasoline">Gasoline</string>
+    <string name="fuel_lpg">LPG</string>
+    <string name="fuel_electric">Electric</string>
+    <string name="fuel_hybrid">Hybrid</string>
+    <string name="tank_capacity_label">Tank Capacity (Liters)</string>
+    <string name="current_km_label">Current Km *</string>
+    <string name="current_km_placeholder">e.g. 375529</string>
+
+    <!-- intervals -->
+    <string name="new_interval">New interval</string>
+    <string name="edit_interval">Edit interval</string>
+    <string name="what_needs_doing">What needs doing? *</string>
+    <string name="interval_title_placeholder">e.g. Oil + filter change</string>
+    <string name="category_label">Category</string>
+    <string name="how_often">How often?</string>
+    <string name="months_label">Months</string>
+    <string name="months_placeholder">12</string>
+    <string name="kilometres_label">Kilometres</string>
+    <string name="km_placeholder">10000</string>
+    <string name="set_interval_error">Set months, kilometres, or both</string>
+    <string name="set_interval_hint">Set months, kilometres, or both. Whichever comes first wins.</string>
+    <string name="last_done">Last done</string>
+    <string name="last_done_hint">Only used until a matching entry exists in your history.</string>
+    <string name="date_label">Date</string>
+    <string name="pick_date_desc">Pick date</string>
+    <string name="mileage_km_label">Mileage (km)</string>
+    <string name="mileage_placeholder">370000</string>
+    <string name="ok">OK</string>
+
+    <!-- maintenance entries -->
+    <string name="entry_title_placeholder">e.g. Oil + filter change (10w40)</string>
+    <string name="approximate_date">Approximate date</string>
+    <string name="date_or_mileage_error">Enter a date or a mileage</string>
+    <string name="cost_label">Cost (€)</string>
+    <string name="cost_placeholder">e.g. 89.50</string>
+    <string name="workshop_label">Workshop</string>
+    <string name="notes_label">Notes</string>
+
+    <!-- history -->
+    <string name="no_entries_yet">No entries yet</string>
+    <string name="no_date">No date</string>
+
+    <!-- update mileage dialog -->
+    <string name="update_mileage">Update mileage</string>
+    <string name="current_mileage_format">Current: %1$s km</string>
+    <string name="new_reading_label">New reading (km)</string>
+    <string name="enter_a_number">Enter a number</string>
+    <string name="mileage_too_low">Cannot be lower than the current reading</string>
+
+    <!-- interval list screen -->
+    <string name="add_interval_hint">Add a rule like "Oil change every 12 months or 10,000 km" to see what\'s coming up on the home screen.</string>
+    <string name="add_interval">Add interval</string>
+    <string name="every_km">every %1$s km</string>
+    <string name="no_interval_set">No interval set</string>
+    <string name="interval_separator"> or </string>
+
+    <!-- formats.kt string representations -->
+    <string name="km_overdue">%1$s km overdue</string>
+    <string name="in_km">"in %1$s km"</string>
+
+
+
+    <!-- plurals -->
+    <plurals name="due_in_months">
+        <item quantity="one">in %d month</item>
+        <item quantity="other">in %d months</item>
+    </plurals>
+    <plurals name="overdue_months">
+        <item quantity="one">%d month overdue</item>
+        <item quantity="other">%d months overdue</item>
+    </plurals>
+    <plurals name="every_months">
+        <item quantity="one">every %d month</item>
+        <item quantity="other">every %d months</item>
+    </plurals>
 </resources>

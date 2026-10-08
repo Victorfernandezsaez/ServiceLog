@@ -12,13 +12,17 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.servicelog.domain.Vehicle
 import com.example.servicelog.domain.VehicleType
+import com.example.servicelog.domain.FuelType
 import com.example.servicelog.domain.icon
+import androidx.compose.ui.res.pluralStringResource
+import com.example.servicelog.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,12 +31,11 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
     var brand by rememberSaveable(vehicleToEdit) { mutableStateOf(vehicleToEdit?.brand ?: "") }
     var model by rememberSaveable(vehicleToEdit) { mutableStateOf(vehicleToEdit?.model ?: "") }
     var year by rememberSaveable(vehicleToEdit) { mutableStateOf(vehicleToEdit?.year?.toString() ?: "") }
-    var typeOfFuel by rememberSaveable(vehicleToEdit) { mutableStateOf(vehicleToEdit?.typeOfFuel ?: "") }
+    var selectedFuelType by rememberSaveable(vehicleToEdit) { mutableStateOf(vehicleToEdit?.fuelType) }
     var tankCapacity by rememberSaveable(vehicleToEdit) { mutableStateOf(vehicleToEdit?.tankCapacity?.toString() ?: "") }
     var currentKm by rememberSaveable(vehicleToEdit) { mutableStateOf(vehicleToEdit?.currentKm?.toString() ?: "") }
 
     var fuelMenuExpanded by remember { mutableStateOf(false) }
-    val fuelOptions = listOf("Diesel", "Gasoline", "LPG", "Electric", "Hybrid")
 
     var brandError by remember { mutableStateOf(false) }
     var modelError by remember { mutableStateOf(false) }
@@ -78,7 +81,7 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "About your ${selectedType.label}",
+                        text = stringResource(R.string.about_your_vehicle, selectedType.label),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -99,7 +102,7 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                         value = selectedType.label,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Vehicle Type *") },
+                        label = { Text(stringResource(R.string.vehicle_type_label)) },
                         colors = customTextFieldColors,
                         leadingIcon = {
                             Icon(selectedType.icon, contentDescription = null)
@@ -134,8 +137,8 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                 OutlinedTextField(
                     value = alias,
                     onValueChange = { alias = it },
-                    label = { Text("Alias") },
-                    placeholder = { Text("e.g. Daily Driver, Family SUV") },
+                    label = { Text(stringResource(R.string.alias_label)) },
+                    placeholder = { Text(stringResource(R.string.alias_placeholder)) },
                     colors = customTextFieldColors,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -145,12 +148,12 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                 OutlinedTextField(
                     value = brand,
                     onValueChange = { brand = it; brandError = false },
-                    label = { Text("Brand *") },
-                    placeholder = { Text("e.g. VW, Toyota, BMW") },
+                    label = { Text(stringResource(R.string.brand_label)) },
+                    placeholder = { Text(stringResource(R.string.brand_placeholder)) },
                     isError = brandError,
                     supportingText = {
                         if (brandError) {
-                            Text("This field is required", color = MaterialTheme.colorScheme.error)
+                            Text(stringResource(R.string.field_required), color = MaterialTheme.colorScheme.error)
                         }
                     },
                     colors = customTextFieldColors,
@@ -163,12 +166,12 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                 OutlinedTextField(
                     value = model,
                     onValueChange = { model = it; modelError = false },
-                    label = { Text("Model *") },
-                    placeholder = { Text("e.g. Fiesta, Golf") },
+                    label = { Text(stringResource(R.string.model_label)) },
+                    placeholder = { Text(stringResource(R.string.model_placeholder)) },
                     isError = modelError,
                     supportingText = {
                         if (modelError) {
-                            Text("This field is required", color = MaterialTheme.colorScheme.error)
+                            Text(stringResource(R.string.field_required), color = MaterialTheme.colorScheme.error)
                         }
                     },
                     colors = customTextFieldColors,
@@ -180,11 +183,11 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                 OutlinedTextField(
                     value = year,
                     onValueChange = { year = it; yearError = false },
-                    label = { Text("Year of fabrication") },
+                    label = { Text(stringResource(R.string.year_label)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = yearError,
-                    supportingText = { if (yearError) Text("Only numbers in this field") },
-                    placeholder = { Text("e.g. 2016") },
+                    supportingText = { if (yearError) Text(stringResource(R.string.only_numbers_error)) },
+                    placeholder = { Text(stringResource(R.string.year_placeholder)) },
                     colors = customTextFieldColors,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -197,11 +200,11 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                     onExpandedChange = { fuelMenuExpanded = it }
                 ) {
                     OutlinedTextField(
-                        value = typeOfFuel,
+                        value = selectedFuelType?.let { stringResource(it.labelRes) } ?: "",
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Type of fuel") },
-                        placeholder = { Text("Select fuel type") },
+                        label = { Text(stringResource(R.string.fuel_type_label)) },
+                        placeholder = { Text(stringResource(R.string.fuel_type_placeholder)) },
                         colors = customTextFieldColors,
                         trailingIcon = {
                             ExposedDropdownMenuDefaults.TrailingIcon(expanded = fuelMenuExpanded)
@@ -218,11 +221,11 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                         expanded = fuelMenuExpanded,
                         onDismissRequest = { fuelMenuExpanded = false }
                     ) {
-                        fuelOptions.forEach { option ->
+                        FuelType.entries.forEach { option ->
                             DropdownMenuItem(
-                                text = { Text(option) },
+                                text = { Text(stringResource(option.labelRes)) },
                                 onClick = {
-                                    typeOfFuel = option
+                                    selectedFuelType = option
                                     fuelMenuExpanded = false
                                 }
                             )
@@ -235,10 +238,10 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                 OutlinedTextField(
                     value = tankCapacity,
                     onValueChange = { tankCapacity = it; tankCapacityError = false },
-                    label = { Text("Tank Capacity (Liters)") },
+                    label = { Text(stringResource(R.string.tank_capacity_label)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = tankCapacityError,
-                    supportingText = { if (tankCapacityError) Text("Solo se permiten números") },
+                    supportingText = { if (tankCapacityError) Text(stringResource(R.string.only_numbers)) },
                     colors = customTextFieldColors,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -251,11 +254,11 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                             currentKm = input; currentKmError = false
                         }
                     },
-                    label = { Text("Current Km *") },
-                    placeholder = { Text("e.g. 375529") },
+                    label = { Text(stringResource(R.string.current_km_label)) },
+                    placeholder = { Text(stringResource(R.string.current_km_placeholder)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = currentKmError,
-                    supportingText = { if (currentKmError) Text("Only numbers in this field") },
+                    supportingText = { if (currentKmError) Text(stringResource(R.string.only_numbers_error)) },
                     colors = customTextFieldColors,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -271,7 +274,7 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                         onClick = { onCancelClick() },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Cancel", color = Color.Black)
+                        Text(stringResource(R.string.cancel), color = Color.Black)
                     }
 
                     Spacer(modifier = Modifier.width(16.dp))
@@ -321,7 +324,7 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                                         brand = brand,
                                         model = model,
                                         year = yearNum,
-                                        typeOfFuel = typeOfFuel,
+                                        fuelType = selectedFuelType,
                                         tankCapacity = tankNum,
                                         currentKm = kmNum ?: 0,
                                     )
@@ -331,7 +334,7 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEBE0FF))
                     ) {
-                        Text("Save", color = Color.Black)
+                        Text(stringResource(R.string.save), color = Color.Black)
                     }
                 }
 

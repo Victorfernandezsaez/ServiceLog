@@ -2,6 +2,7 @@ package com.example.servicelog.data
 
 import androidx.room.TypeConverter
 import com.example.servicelog.domain.VehicleType
+import com.example.servicelog.domain.FuelType
 import java.time.LocalDate
 
 class Converters {
@@ -10,6 +11,13 @@ class Converters {
 
     @TypeConverter
     fun toVehicleType(value: String): VehicleType = VehicleType.valueOf(value)
+
+    @TypeConverter
+    fun fromFuelType(value: FuelType?): String? = value?.name
+
+    @TypeConverter
+    fun toFuelType(value: String?): FuelType? = value?.let { FuelType.valueOf(it) }
+
     @TypeConverter
     fun fromDate(value: LocalDate?): Long? = value?.toEpochDay()
 
