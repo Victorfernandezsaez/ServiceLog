@@ -76,7 +76,7 @@ fun VehicleInfo(
                 Spacer(Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        stringResource(R.string.mileage_km, numberFormat.format(vehicle.currentKm)),
+                        stringResource(R.string.mileage_km_format, numberFormat.format(vehicle.currentKm)),
                         fontSize = 14.sp
                     )
                     Spacer(Modifier.width(8.dp))

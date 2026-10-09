@@ -3,12 +3,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.servicelog.data.IntervalRepository
 import com.example.servicelog.domain.MaintenanceInterval
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class IntervalViewModel(private val repo: IntervalRepository) : ViewModel() {
+@HiltViewModel
+class IntervalViewModel @Inject constructor(private val repo: IntervalRepository) : ViewModel() {
     private val vehicleId = MutableStateFlow<Long?>(null)
 
     val intervals: StateFlow<UiState<List<MaintenanceInterval>>> = vehicleId

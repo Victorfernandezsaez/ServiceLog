@@ -17,13 +17,16 @@ import kotlinx.coroutines.launch
         RefuelEntity::class,
         MaintenanceIntervalEntity::class
     ],
-    version = 5
+    version = 6,
+    exportSchema = false
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun vehicleDao(): VehicleDao
     abstract fun maintenanceDao(): MaintenanceDao
+
+    abstract fun refuelDao(): RefuelDao
 
     abstract fun maintenanceIntervalDao(): MaintenanceIntervalDao
 

@@ -2,6 +2,7 @@ package com.example.servicelog.ui
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -23,6 +24,12 @@ val numberFormat: NumberFormat = NumberFormat.getIntegerInstance(appLocale)
 
 val dayFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH)
 val monthFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MMMM yyyy", Locale.ENGLISH)
+
+val costFormat: NumberFormat = NumberFormat.getNumberInstance(appLocale).apply {
+    minimumFractionDigits = 2
+    maximumFractionDigits = 2
+    isGroupingUsed = false
+}
 
 @Composable
 fun Urgency.color(): Color = when (this) {

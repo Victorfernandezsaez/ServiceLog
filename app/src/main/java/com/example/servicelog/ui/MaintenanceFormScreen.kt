@@ -43,14 +43,6 @@ fun MaintenanceFormScreen(
     var dateApprox by rememberSaveable(entryToEdit) { mutableStateOf(entryToEdit?.dateIsApproximate ?: false) }
     var mileage by rememberSaveable(entryToEdit) { mutableStateOf(entryToEdit?.mileage?.toString() ?: "") }
 
-    val locale = LocalConfiguration.current.locales[0]
-    val costFormat = remember(locale) {
-        NumberFormat.getNumberInstance(locale).apply {
-            minimumFractionDigits = 2
-            maximumFractionDigits = 2
-            isGroupingUsed = false
-        }
-    }
 
     var cost by rememberSaveable(entryToEdit) {
         mutableStateOf(entryToEdit?.costCents?.let { costFormat.format(it / 100.0) } ?: "")

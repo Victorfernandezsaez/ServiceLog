@@ -37,7 +37,7 @@ import com.example.servicelog.domain.Vehicle
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    vehicleState: UiState<Vehicle?> ,
+    vehicleState: UiState<Vehicle?>,
     dueStatuses: List<DueStatus>,
     onAddClick: () -> Unit,
     onEditClick: () -> Unit,
