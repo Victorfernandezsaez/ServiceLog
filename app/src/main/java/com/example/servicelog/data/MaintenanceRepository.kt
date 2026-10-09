@@ -12,6 +12,11 @@ class MaintenanceRepository(private val dao: MaintenanceDao) {
     suspend fun save(entry: MaintenanceEntry) = dao.save(entry.toEntity())
 
     suspend fun delete(entry: MaintenanceEntry) = dao.delete(entry.toEntity())
+
+    fun observeMonthlyMaintenance(vehicleId: Long): Flow<Map<String, Int>> =
+        dao.observeMonthlyCosts(vehicleId).map { list ->
+            list.associate { it.month to it.totalCents }
+        }
 }
 
 private fun MaintenanceEntryEntity.toDomain() = MaintenanceEntry(

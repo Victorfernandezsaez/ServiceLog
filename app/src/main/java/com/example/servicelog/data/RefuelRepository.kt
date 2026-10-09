@@ -12,6 +12,11 @@ class RefuelRepository(private val dao: RefuelDao) {
     suspend fun save(refuel: Refuel) = dao.save(refuel.toRefuelEntity())
 
     suspend fun delete(refuel: Refuel) = dao.delete(refuel.toRefuelEntity())
+
+    fun observeMonthlyFuel(vehicleId: Long): Flow<Map<String, Int>> =
+        dao.observeMonthlyCosts(vehicleId).map { list ->
+            list.associate { it.month to it.totalCents }
+        }
 }
 
 private fun RefuelEntity.toRefuelDomain() = Refuel(

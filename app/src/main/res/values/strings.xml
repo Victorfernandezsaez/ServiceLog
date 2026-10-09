@@ -116,6 +116,13 @@
     <string name="full_tank">Full tank</string>
     <string name="full_tank_hint">Needed to calculate exact consumption for this tank</string>
     <string name="add_refuel">Add refuel</string>
+    <string name="recent_month">Recent month</string>
+    <string name="fuel">Fuel</string>
+    <string name="maintenance">Maintenance</string>
+    <string name="recent_refuels">Recent refuels</string>
+    <string name="average_consumption">Average consumption: %1$s L/100km (estimated)</string>
+    <string name="last_tank_consumption">Last tank: %1$s L/100km</string>
+    <string name="not_enough_refuels">Not enough refuels yet to estimate consumption</string>
 
     <!-- plurals -->
     <plurals name="due_in_months">

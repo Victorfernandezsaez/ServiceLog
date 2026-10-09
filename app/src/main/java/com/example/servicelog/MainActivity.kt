@@ -4,10 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
@@ -41,10 +38,8 @@ import com.example.servicelog.ui.UpdateMileageDialog
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.servicelog.ui.costFormat
-import com.example.servicelog.ui.dayFormatter
-import com.example.servicelog.ui.moneyFormat
-import com.example.servicelog.ui.numberFormat
+import com.example.servicelog.ui.CostsScreen
+
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -100,9 +95,9 @@ fun AppNavigation(
             .sortedBy { it.urgency.ordinal }
     }
 
-
-
     var showMileageDialog by remember { mutableStateOf(false) }
+
+    val summaryState by refuelViewModel.summary.collectAsStateWithLifecycle()
 
     Scaffold(
         bottomBar = {
@@ -309,20 +304,11 @@ fun AppNavigation(
             }
 
             composable(Navigation.COSTS.route) {
-                LazyColumn(Modifier.fillMaxSize()) {
-                    items(refuels.sortedByDescending { it.mileage }) { r ->
-                        ListItem(
-                            headlineContent = {
-                                Text("${numberFormat.format(r.mileage)} km · ${costFormat.format(r.liters)} L")
-                            },
-                            supportingContent = { Text(r.date.format(dayFormatter)) },
-                            trailingContent = { Text(moneyFormat.format(r.costCents / 100.0)) },
-                            modifier = Modifier.clickable { navController.navigate("refuelForm/${r.id}") }
-                        )
-                        HorizontalDivider()
-                    }
-                }
-            }        }
+                CostsScreen(
+                    summaryState = summaryState,
+                    onRefuelClick = { navController.navigate("refuelForm/${it.id}") }
+                )
+            }      }
     }
 
     val v = vehicle
