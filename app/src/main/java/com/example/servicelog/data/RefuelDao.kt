@@ -8,11 +8,12 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface RefuelDao {
-    @Query("SELECT * FROM maintenance_entry WHERE vehicleId = :vehicleId ORDER BY date DESC, mileage ASC")
-    fun observeEntries(vehicleId: Long): Flow<List<MaintenanceEntryEntity>>
+    @Query("SELECT * FROM refuel WHERE vehicleId = :vehicleId ORDER BY mileage ASC")
+    fun observeRefuels(vehicleId: Long): Flow<List<RefuelEntity>>
 
     @Upsert
-    suspend fun save(entry: MaintenanceEntryEntity)
+    suspend fun save(refuel: RefuelEntity)
+
     @Delete
-    suspend fun delete(entry: MaintenanceEntryEntity)
+    suspend fun delete(refuel: RefuelEntity)
 }

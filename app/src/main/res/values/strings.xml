@@ -30,7 +30,6 @@
     <string name="what_was_done">What was done? *</string>
     <string name="field_required">This field is required</string>
     <string name="date_or_mileage_required">Date or mileage required</string>
-    <string name="mileage_km">Km</string>
 
     <string name="about_your_vehicle">About your %1$s</string>
     <string name="vehicle_type_label">Vehicle Type *</string>
@@ -107,7 +106,16 @@
     <string name="km_overdue">%1$s km overdue</string>
     <string name="in_km">"in %1$s km"</string>
 
-
+    <!-- refuel -->
+    <string name="new_refuel">New refuel</string>
+    <string name="edit_refuel">Edit refuel</string>
+    <string name="delete_refuel">Delete refuel</string>
+    <string name="delete_refuel_title">Delete this refuel?</string>
+    <string name="liters_label">Litres</string>
+    <string name="liters_placeholder">e.g. 52.40</string>
+    <string name="full_tank">Full tank</string>
+    <string name="full_tank_hint">Needed to calculate exact consumption for this tank</string>
+    <string name="add_refuel">Add refuel</string>
 
     <!-- plurals -->
     <plurals name="due_in_months">

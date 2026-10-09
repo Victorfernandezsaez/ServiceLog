@@ -2,8 +2,8 @@ package com.example.servicelog.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.servicelog.data.MaintenanceRepository
-import com.example.servicelog.domain.MaintenanceEntry
+import com.example.servicelog.data.RefuelRepository
+import com.example.servicelog.domain.Refuel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -12,23 +12,22 @@ import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
-class MaintenanceViewModel @Inject constructor(private val repo: MaintenanceRepository) : ViewModel() {
+class RefuelViewModel @Inject constructor(
+    private val repo: RefuelRepository
+) : ViewModel() {
+
     private val vehicleId = MutableStateFlow<Long?>(null)
 
-    val entries: StateFlow<UiState<List<MaintenanceEntry>>> = vehicleId
+    val refuels: StateFlow<UiState<List<Refuel>>> = vehicleId
         .filterNotNull()
-        .flatMapLatest { repo.observeEntries(it) }
-        .map<List<MaintenanceEntry>, UiState<List<MaintenanceEntry>>> { UiState.Content(it) }
+        .flatMapLatest { repo.observeRefuels(it) }
+        .map<List<Refuel>, UiState<List<Refuel>>> { UiState.Content(it) }
         .catch { emit(UiState.Error(it.message ?: "Unknown error")) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UiState.Loading)
 
     fun setVehicle(id: Long) { vehicleId.value = id }
 
-    fun save(entry: MaintenanceEntry) {
-        viewModelScope.launch { repo.save(entry) }
-    }
+    fun save(refuel: Refuel) { viewModelScope.launch { repo.save(refuel) } }
 
-    fun delete(entry: MaintenanceEntry) {
-        viewModelScope.launch { repo.delete(entry) }
-    }
+    fun delete(refuel: Refuel) { viewModelScope.launch { repo.delete(refuel) } }
 }

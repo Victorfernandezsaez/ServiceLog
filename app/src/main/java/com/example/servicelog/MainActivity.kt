@@ -4,7 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
@@ -13,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.servicelog.ui.FormScreen
@@ -25,7 +27,6 @@ import androidx.compose.runtime.getValue
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.servicelog.domain.calculateDue
-import com.example.servicelog.ui.AppViewModelFactory
 import com.example.servicelog.ui.HistoryScreen
 import com.example.servicelog.ui.HomeScreen
 import com.example.servicelog.ui.IntervalFormScreen
@@ -33,10 +34,19 @@ import com.example.servicelog.ui.IntervalViewModel
 import com.example.servicelog.ui.IntervalsScreen
 import com.example.servicelog.ui.MaintenanceFormScreen
 import com.example.servicelog.ui.MaintenanceViewModel
+import com.example.servicelog.ui.RefuelFormScreen
+import com.example.servicelog.ui.RefuelViewModel
 import com.example.servicelog.ui.UiState
 import com.example.servicelog.ui.UpdateMileageDialog
+import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.servicelog.ui.costFormat
+import com.example.servicelog.ui.dayFormatter
+import com.example.servicelog.ui.moneyFormat
+import com.example.servicelog.ui.numberFormat
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,10 +66,13 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AppNavigation(
-    viewModel: VehicleViewModel = viewModel(factory = AppViewModelFactory),
-    maintenanceViewModel: MaintenanceViewModel = viewModel(factory = AppViewModelFactory),
-    intervalViewModel: IntervalViewModel = viewModel(factory = AppViewModelFactory)
+    viewModel: VehicleViewModel = hiltViewModel(),
+    maintenanceViewModel: MaintenanceViewModel = hiltViewModel(),
+    intervalViewModel: IntervalViewModel = hiltViewModel(),
+    refuelViewModel: RefuelViewModel = hiltViewModel()
 ) {
+    val refuelsState by refuelViewModel.refuels.collectAsStateWithLifecycle()
+    val refuels = (refuelsState as? UiState.Content)?.data ?: emptyList()
     val navController = rememberNavController()
     val vehicleState by viewModel.vehicle.collectAsStateWithLifecycle()
     val entriesState by maintenanceViewModel.entries.collectAsStateWithLifecycle()
@@ -73,6 +86,7 @@ fun AppNavigation(
         vehicle?.id?.let {
             maintenanceViewModel.setVehicle(it)
             intervalViewModel.setVehicle(it)
+            refuelViewModel.setVehicle(it)
         }
     }
 
@@ -127,6 +141,13 @@ fun AppNavigation(
                         }
                     }
                 }
+                Navigation.COSTS.route ->{
+                    if (vehicle != null) {
+                        FloatingActionButton(onClick = { navController.navigate("refuelForm") }) {
+                            Icon(Icons.Filled.Add, contentDescription = "Add refuel")
+                        }
+                    }
+                }
             }
         }
 
@@ -156,15 +177,6 @@ fun AppNavigation(
                         navController.popBackStack()
                     },
                     onCancelClick = { navController.popBackStack() }
-                )
-            }
-
-            composable("maintenanceForm") {
-                MaintenanceFormScreen(
-                    entryToEdit = null,
-                    vehicleId = vehicle?.id ?: 0,
-                    onSave = { navController.popBackStack() },
-                    onCancel = { navController.popBackStack() }
                 )
             }
 
@@ -258,8 +270,59 @@ fun AppNavigation(
                 )
             }
 
-            composable(Navigation.COSTS.route) { PlaceholderScreen("Costs") }
-        }
+            composable("refuelForm") {
+                RefuelFormScreen(
+                    refuelToEdit = null,
+                    vehicleId = vehicle?.id ?: 0,
+                    lastMileage = vehicle?.currentKm ?: 0,
+                    tankCapacity = vehicle?.tankCapacity,
+                    onSave = {
+                        refuelViewModel.save(it)
+                        val vehicle = vehicle
+                        if (vehicle != null && it.mileage > vehicle.currentKm) {
+                            viewModel.save(vehicle.copy(currentKm = it.mileage, lastReadingDate = it.date))
+                        }
+                        navController.popBackStack()
+                    },
+                    onCancel = { navController.popBackStack() }
+                )
+            }
+
+            composable(
+                route = "refuelForm/{refuelId}",
+                arguments = listOf(navArgument("refuelId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val id = backStackEntry.arguments?.getLong("refuelId") ?: 0L
+                val refuel = refuels.find { it.id == id }
+                RefuelFormScreen(
+                    refuelToEdit = refuel,
+                    vehicleId = vehicle?.id ?: 0,
+                    lastMileage = vehicle?.currentKm ?: 0,
+                    tankCapacity = vehicle?.tankCapacity,
+                    onSave = { refuelViewModel.save(it); navController.popBackStack() },
+                    onCancel = { navController.popBackStack() },
+                    onDelete = {
+                        refuel?.let { refuelViewModel.delete(it) }
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(Navigation.COSTS.route) {
+                LazyColumn(Modifier.fillMaxSize()) {
+                    items(refuels.sortedByDescending { it.mileage }) { r ->
+                        ListItem(
+                            headlineContent = {
+                                Text("${numberFormat.format(r.mileage)} km · ${costFormat.format(r.liters)} L")
+                            },
+                            supportingContent = { Text(r.date.format(dayFormatter)) },
+                            trailingContent = { Text(moneyFormat.format(r.costCents / 100.0)) },
+                            modifier = Modifier.clickable { navController.navigate("refuelForm/${r.id}") }
+                        )
+                        HorizontalDivider()
+                    }
+                }
+            }        }
     }
 
     val v = vehicle
