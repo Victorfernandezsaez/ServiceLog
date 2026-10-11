@@ -1,30 +1,62 @@
 package com.example.servicelog.ui
 
 import android.content.res.Configuration
-import android.icu.text.NumberFormat
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.servicelog.R
 import com.example.servicelog.domain.Category
 import com.example.servicelog.domain.MaintenanceEntry
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.res.stringResource
-import com.example.servicelog.R
 
 private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
 
@@ -68,10 +100,18 @@ fun MaintenanceFormScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-            Text(
-                text = if (entryToEdit == null) stringResource(R.string.new_entry) else stringResource(R.string.edit_entry),
-                style = MaterialTheme.typography.headlineSmall
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = onCancel, modifier = Modifier.padding(end = 8.dp)) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = stringResource(R.string.cancel)
+                    )
+                }
+                Text(
+                    text = if (entryToEdit == null) stringResource(R.string.new_entry) else stringResource(R.string.edit_entry),
+                    style = MaterialTheme.typography.headlineSmall
+                )
+            }
 
             Spacer(Modifier.height(24.dp))
 
@@ -135,6 +175,7 @@ fun MaintenanceFormScreen(
                     if (input.all { it.isDigit() }) { mileage = input; dateOrMileageError = false }
                 },
                 label = { Text(stringResource(R.string.mileage_km_label)) },
+                suffix = { Text("km") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 isError = dateOrMileageError,
                 supportingText = {
@@ -150,6 +191,7 @@ fun MaintenanceFormScreen(
                 onValueChange = { cost = it },
                 label = { Text(stringResource(R.string.cost_label)) },
                 placeholder = { Text(stringResource(R.string.cost_placeholder)) },
+                suffix = { Text("€") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -172,18 +214,6 @@ fun MaintenanceFormScreen(
                 minLines = 3,
                 modifier = Modifier.fillMaxWidth()
             )
-
-            if (entryToEdit != null && onDelete != null) {
-                TextButton(
-                    onClick = { showDeleteDialog = true },
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.error
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(stringResource(R.string.delete_entry))
-                }
-            }
 
             Spacer(Modifier.height(32.dp))
 
@@ -221,6 +251,25 @@ fun MaintenanceFormScreen(
                     },
                     modifier = Modifier.weight(1f)
                 ) { Text(stringResource(R.string.save)) }
+            }
+
+            if (entryToEdit != null && onDelete != null) {
+                Spacer(Modifier.height(16.dp))
+                Button(
+                    onClick = { showDeleteDialog = true },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.error
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = null,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    Text(stringResource(R.string.delete_entry))
+                }
             }
 
             Spacer(Modifier.height(24.dp))

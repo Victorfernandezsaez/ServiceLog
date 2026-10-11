@@ -14,6 +14,7 @@ import java.time.LocalDate
     )],
     indices = [Index("vehicleId")]
 )
+
 data class MaintenanceEntryEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val intervalId: Long? = null,
@@ -23,6 +24,10 @@ data class MaintenanceEntryEntity(
     val date: LocalDate?,
     val dateIsApproximate: Boolean = false,
     val mileage: Int?,
+    /**
+     * Stored in cents as an integer. Floating-point money accumulates rounding
+     * errors across sums, which would show up in the monthly totals.
+     */
     val costCents: Int?,
     val workshop: String?,
     val notes: String?,

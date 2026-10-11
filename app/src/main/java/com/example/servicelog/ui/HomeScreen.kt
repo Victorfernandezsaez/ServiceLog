@@ -22,13 +22,13 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.servicelog.R
 import com.example.servicelog.domain.DueStatus
@@ -50,42 +50,48 @@ fun HomeScreen(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(50.dp))
-        when (val state = vehicleState) {
+        when (vehicleState) {
             is UiState.Loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
+
             is UiState.Error -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(stringResource(R.string.error_loading))
             }
+
             is UiState.Content -> {
-                val vehicle = state.data
+                val vehicle = vehicleState.data
                 if (vehicle == null) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .clickable { onAddClick() },
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFEBE0FF))
-                ) {
-                Row(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(100.dp)
+                            .clickable { onAddClick() },
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                     ) {
-                        Icon(Icons.Filled.DirectionsCar, contentDescription = stringResource(R.string.add), modifier = Modifier.size(40.dp))
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Text(text = stringResource(R.string.add), fontSize = 24.sp)
-                      }
-            }
+                        Row(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                Icons.Filled.DirectionsCar,
+                                contentDescription = stringResource(R.string.add),
+                                modifier = Modifier.size(40.dp)
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Text(text = stringResource(R.string.add), fontSize = 24.sp)
+                        }
+                    }
                 } else {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable { onEditClick() }
-                    )
+                    ) {
                         VehicleInfo(vehicle, dueStatuses, onUpdateMileage)
+                    }
                 }
             }
         }
