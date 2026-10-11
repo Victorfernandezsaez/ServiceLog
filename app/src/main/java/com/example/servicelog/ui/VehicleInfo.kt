@@ -2,9 +2,9 @@ package com.example.servicelog.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,10 +13,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,15 +26,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.servicelog.R
 import com.example.servicelog.domain.DueStatus
 import com.example.servicelog.domain.Vehicle
 import com.example.servicelog.domain.icon
-import com.example.servicelog.R
 
 @Composable
 fun VehicleInfo(
@@ -47,17 +48,13 @@ fun VehicleInfo(
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    Color(0xFFEBE0FF),
-                    shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
-                )
-                .padding(24.dp),
-            contentAlignment = Alignment.Center
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+            shape = MaterialTheme.shapes.large
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(modifier = Modifier.padding(16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = vehicle.type.icon,
@@ -65,50 +62,78 @@ fun VehicleInfo(
                         modifier = Modifier.size(32.dp)
                     )
                     Spacer(modifier = Modifier.width(16.dp))
-                    Text(
-                        text = listOf(vehicle.alias, vehicle.brand, vehicle.model)
-                            .filter { it.isNotBlank() }
-                            .joinToString(" "),
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Column {
+                        Text(
+                            text = vehicle.alias,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = listOf(vehicle.brand, vehicle.model)
+                                .filter { it.isNotBlank() }
+                                .joinToString(" "),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
-                Spacer(Modifier.height(4.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        stringResource(R.string.mileage_km_format, numberFormat.format(vehicle.currentKm)),
-                        fontSize = 14.sp
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    TextButton(
-                        onClick = onUpdateMileage,
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
-                    ) { Text(stringResource(R.string.update), fontSize = 12.sp) }
-                }
-                vehicle.lastReadingDate?.let {
-                    Text(stringResource(R.string.mileage_as_of, it.format(dayFormatter)), fontSize = 11.sp, color = Color.Gray)
+                Spacer(Modifier.height(16.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column {
+                        Text(
+                            stringResource(
+                                R.string.mileage_km_format,
+                                numberFormat.format(vehicle.currentKm)
+                            ),
+                            style = MaterialTheme.typography.displaySmall
+                        )
+                        vehicle.lastReadingDate?.let {
+                            Text(
+                                stringResource(R.string.mileage_as_of, it.format(dayFormatter)),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                    OutlinedButton(onClick = onUpdateMileage) {
+                        Text(stringResource(R.string.update))
+                    }
                 }
             }
         }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    Color(0xFFE0E0E0),
-                    shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
-                )
-                .padding(16.dp)
-        ) {
-            Column {
-                Text(stringResource(R.string.next_service), fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                Spacer(Modifier.height(8.dp))
 
-                if (dueStatuses.isEmpty()) {
-                    Text(stringResource(R.string.no_intervals_yet), fontSize = 13.sp)
-                } else {
-                    visible.forEach { status ->
+        Spacer(Modifier.height(24.dp))
+
+        Text(
+            stringResource(R.string.next_service),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        )
+        Spacer(Modifier.height(8.dp))
+
+        if (dueStatuses.isEmpty()) {
+            Text(
+                stringResource(R.string.no_intervals_yet),
+                fontSize = 13.sp,
+                modifier = Modifier.padding(horizontal = 8.dp)
+            )
+        } else {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                visible.forEach { status ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
+                        ),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                        shape = MaterialTheme.shapes.large
+                    ) {
                         Row(
-                            modifier = Modifier.padding(vertical = 4.dp),
+                            modifier = Modifier.padding(16.dp),
                             verticalAlignment = Alignment.Top
                         ) {
                             Box(
@@ -126,21 +151,33 @@ fun VehicleInfo(
                                     color = status.urgency.color()
                                 )
                                 status.lastText()?.let {
-                                    Text(stringResource(R.string.last_prefix, it), fontSize = 11.sp, color = Color.Gray)
+                                    Text(
+                                        stringResource(R.string.last_prefix, it),
+                                        fontSize = 11.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
                                 }
                             }
                         }
                     }
-                    if (dueStatuses.size > 4) {
-                        Text(
-                            text = if (expanded) stringResource(R.string.show_less) else stringResource(R.string.show_more, dueStatuses.size - 4),
-                            fontSize = 12.sp,
-                            color = Color.Gray,
-                            modifier = Modifier
-                                .padding(top = 8.dp)
-                                .clickable { expanded = !expanded }
-                        )
-                    }
+                }
+            }
+            if (dueStatuses.size > 4) {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = if (expanded) stringResource(R.string.show_less) else stringResource(
+                            R.string.show_more,
+                            dueStatuses.size - 4
+                        ),
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier
+                            .padding(top = 8.dp)
+                            .clickable { expanded = !expanded }
+                    )
                 }
             }
         }

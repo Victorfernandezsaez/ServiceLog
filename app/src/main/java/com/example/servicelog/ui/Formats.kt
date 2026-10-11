@@ -1,14 +1,18 @@
 package com.example.servicelog.ui
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.example.servicelog.R
 import com.example.servicelog.domain.DueStatus
 import com.example.servicelog.domain.Urgency
+import com.example.servicelog.ui.theme.okGreenDark
+import com.example.servicelog.ui.theme.okGreenLight
+import com.example.servicelog.ui.theme.warningAmberDark
+import com.example.servicelog.ui.theme.warningAmberLight
 import java.text.NumberFormat
 import java.time.format.DateTimeFormatter
 import java.util.Currency
@@ -32,11 +36,14 @@ val costFormat: NumberFormat = NumberFormat.getNumberInstance(appLocale).apply {
 }
 
 @Composable
-fun Urgency.color(): Color = when (this) {
-    Urgency.OVERDUE -> MaterialTheme.colorScheme.error
-    Urgency.DUE_SOON -> Color(0xFFE8A33D)
-    Urgency.OK -> Color(0xFF3C8C4E)
-    Urgency.UNKNOWN -> MaterialTheme.colorScheme.outline
+fun Urgency.color(): Color {
+    val isDark = isSystemInDarkTheme()
+    return when (this) {
+        Urgency.OVERDUE -> MaterialTheme.colorScheme.error
+        Urgency.DUE_SOON -> if (isDark) warningAmberDark else warningAmberLight
+        Urgency.OK -> if (isDark) okGreenDark else okGreenLight
+        Urgency.UNKNOWN -> MaterialTheme.colorScheme.outline
+    }
 }
 
 @Composable

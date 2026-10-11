@@ -1,28 +1,57 @@
 package com.example.servicelog.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.servicelog.R
+import com.example.servicelog.domain.FuelType
 import com.example.servicelog.domain.Vehicle
 import com.example.servicelog.domain.VehicleType
-import com.example.servicelog.domain.FuelType
 import com.example.servicelog.domain.icon
-import androidx.compose.ui.res.pluralStringResource
-import com.example.servicelog.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,9 +77,9 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
         mutableStateOf(vehicleToEdit?.type ?: VehicleType.CAR)
     }
     val customTextFieldColors = OutlinedTextFieldDefaults.colors(
-        focusedContainerColor = Color(0xFFF3EDFF),
-        unfocusedContainerColor = Color(0xFFF3EDFF),
-        errorContainerColor = Color(0xFFFFE6E6)
+        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+        errorContainerColor = MaterialTheme.colorScheme.errorContainer
     )
     Scaffold(
         modifier = Modifier.fillMaxSize()
@@ -65,25 +94,35 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFEBE0FF), shape = RoundedCornerShape(16.dp))
-                    .padding(vertical = 70.dp),
-                contentAlignment = Alignment.Center
+                    .background(MaterialTheme.colorScheme.primaryContainer, shape = RoundedCornerShape(16.dp))
             ) {
+                IconButton(
+                    onClick = onCancelClick,
+                    modifier = Modifier.align(Alignment.TopStart).padding(16.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = stringResource(R.string.cancel),
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 70.dp),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         imageVector = selectedType.icon,
                         contentDescription = selectedType.label,
-                        modifier = Modifier.size(40.dp)
+                        modifier = Modifier.size(40.dp),
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = stringResource(R.string.about_your_vehicle, selectedType.label),
                         fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 }
             }
@@ -194,7 +233,6 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // 3. Select para el Tipo de Combustible
                 ExposedDropdownMenuBox(
                     expanded = fuelMenuExpanded,
                     onExpandedChange = { fuelMenuExpanded = it }
@@ -241,6 +279,7 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                     label = { Text(stringResource(R.string.tank_capacity_label)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = tankCapacityError,
+                    suffix = { Text("L") },
                     supportingText = { if (tankCapacityError) Text(stringResource(R.string.only_numbers)) },
                     colors = customTextFieldColors,
                     modifier = Modifier.fillMaxWidth()
@@ -258,6 +297,7 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                     placeholder = { Text(stringResource(R.string.current_km_placeholder)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = currentKmError,
+                    suffix = { Text("km") },
                     supportingText = { if (currentKmError) Text(stringResource(R.string.only_numbers_error)) },
                     colors = customTextFieldColors,
                     modifier = Modifier.fillMaxWidth()
@@ -274,7 +314,7 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                         onClick = { onCancelClick() },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text(stringResource(R.string.cancel), color = Color.Black)
+                        Text(stringResource(R.string.cancel))
                     }
 
                     Spacer(modifier = Modifier.width(16.dp))
@@ -332,9 +372,12 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                             }
                         },
                         modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEBE0FF))
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
                     ) {
-                        Text(stringResource(R.string.save), color = Color.Black)
+                        Text(stringResource(R.string.save))
                     }
                 }
 

@@ -19,6 +19,6 @@ data class RefuelEntity(
     val date: LocalDate,
     val mileage: Int,
     val liters: Double,
-    val costCents: Int,
+    val costCents: Int, // see MaintenanceEntry.costCents.
     val fullTank: Boolean
 )

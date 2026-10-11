@@ -1,14 +1,42 @@
 package com.example.servicelog.ui
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -45,8 +73,8 @@ fun RefuelFormScreen(
         mutableStateOf(refuelToEdit?.fullTank ?: true)
     }
 
-    var mileageError by remember { mutableStateOf<String?>(null) }
-    var litersError by remember { mutableStateOf<String?>(null) }
+    var mileageError by remember { mutableStateOf<Int?>(null) }
+    var litersError by remember { mutableStateOf<Int?>(null) }
     var costError by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -60,12 +88,20 @@ fun RefuelFormScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-            Text(
-                text = stringResource(
-                    if (refuelToEdit == null) R.string.new_refuel else R.string.edit_refuel
-                ),
-                style = MaterialTheme.typography.headlineSmall
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = onCancel, modifier = Modifier.padding(end = 8.dp)) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = stringResource(R.string.cancel)
+                    )
+                }
+                Text(
+                    text = stringResource(
+                        if (refuelToEdit == null) R.string.new_refuel else R.string.edit_refuel
+                    ),
+                    style = MaterialTheme.typography.headlineSmall
+                )
+            }
 
             Spacer(Modifier.height(24.dp))
 
@@ -90,9 +126,10 @@ fun RefuelFormScreen(
                     if (input.all { it.isDigit() }) { mileage = input; mileageError = null }
                 },
                 label = { Text(stringResource(R.string.mileage_km_label)) },
+                suffix = { Text("km") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 isError = mileageError != null,
-                supportingText = { mileageError?.let { Text(it) } },
+                supportingText = { mileageError?.let { Text(stringResource(it)) } },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -104,9 +141,10 @@ fun RefuelFormScreen(
                 onValueChange = { liters = it; litersError = null },
                 label = { Text(stringResource(R.string.liters_label)) },
                 placeholder = { Text(stringResource(R.string.liters_placeholder)) },
+                suffix = { Text("L") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 isError = litersError != null,
-                supportingText = { litersError?.let { Text(it) } },
+                supportingText = { litersError?.let { Text(stringResource(it)) } },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -118,9 +156,10 @@ fun RefuelFormScreen(
                 onValueChange = { cost = it; costError = false },
                 label = { Text(stringResource(R.string.cost_label)) },
                 placeholder = { Text(stringResource(R.string.cost_placeholder)) },
+                suffix = { Text("€") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 isError = costError,
-                supportingText = { if (costError) Text(stringResource(R.string.enter_a_number)) },
+                supportingText = { if (costError) Text(stringResource(R.string.error_enter_a_number)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -154,15 +193,15 @@ fun RefuelFormScreen(
                             ?.let { (it * 100).toInt() }
 
                         mileageError = when {
-                            mileageNum == null -> "Enter a number"
+                            mileageNum == null -> R.string.error_enter_a_number
                             refuelToEdit == null && mileageNum < lastMileage ->
-                                "Cannot be lower than the last reading"
+                                R.string.error_cannot_be_lower_than_last_reading
                             else -> null
                         }
                         litersError = when {
-                            litersNum == null || litersNum <= 0 -> "Enter the litres"
+                            litersNum == null || litersNum <= 0 -> R.string.error_enter_litres
                             tankCapacity != null && litersNum > tankCapacity * 1.1 ->
-                                "More than the tank holds"
+                                R.string.error_more_than_tank_holds
                             else -> null
                         }
                         costError = costCents == null
@@ -187,13 +226,21 @@ fun RefuelFormScreen(
 
             if (refuelToEdit != null && onDelete != null) {
                 Spacer(Modifier.height(16.dp))
-                TextButton(
+                Button(
                     onClick = { showDeleteDialog = true },
-                    colors = ButtonDefaults.textButtonColors(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
                         contentColor = MaterialTheme.colorScheme.error
                     ),
                     modifier = Modifier.fillMaxWidth()
-                ) { Text(stringResource(R.string.delete_refuel)) }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = null,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    Text(stringResource(R.string.delete_refuel))
+                }
             }
 
             Spacer(Modifier.height(24.dp))

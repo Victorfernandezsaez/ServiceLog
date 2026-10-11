@@ -6,6 +6,20 @@ import java.time.temporal.ChronoUnit
 const val DUE_SOON_MONTHS = 2L
 const val DUE_SOON_KM = 1000
 
+/**
+ * Works out whether a maintenance interval is due.
+ *
+ * Date and mileage are evaluated independently and the nearer one wins.
+ * They are not interchangeable: a date-based due point can be scheduled in
+ * advance, while a mileage-based one cannot, because the app has no way of
+ * knowing the current odometer reading until the user enters it. Mileage
+ * is therefore presented as status and re-evaluated whenever a new reading
+ * arrives.
+ *
+ * An entry linked through intervalId takes precedence over category
+ * matching. Category is only a fallback for entries recorded without a
+ * link, and it is imprecise when several intervals share one category.
+ */
 fun calculateDue(
     interval: MaintenanceInterval,
     entries: List<MaintenanceEntry>,

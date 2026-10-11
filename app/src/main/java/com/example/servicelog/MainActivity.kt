@@ -9,9 +9,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import com.example.servicelog.ui.theme.ServiceLogTheme
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -37,9 +36,9 @@ import com.example.servicelog.ui.UiState
 import com.example.servicelog.ui.UpdateMileageDialog
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.servicelog.ui.CostsScreen
-
+import androidx.compose.ui.res.stringResource
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -47,10 +46,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MaterialTheme {
+            ServiceLogTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.surfaceContainerLowest
                 ) {
                     AppNavigation()
                 }
@@ -100,6 +99,7 @@ fun AppNavigation(
     val summaryState by refuelViewModel.summary.collectAsStateWithLifecycle()
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
         bottomBar = {
             if (showBar) {
                 NavigationBar {
@@ -112,8 +112,8 @@ fun AppNavigation(
                                     launchSingleTop = true
                                 }
                             },
-                            icon = { Icon(dest.icon, contentDescription = dest.label) },
-                            label = { Text(dest.label) }
+                            icon = { Icon(dest.icon, contentDescription = stringResource(dest.labelRes)) },
+                            label = { Text(stringResource(dest.labelRes)) }
                         )
                     }
                 }
@@ -125,21 +125,21 @@ fun AppNavigation(
                 Navigation.HOME.route -> {
                     if (vehicle != null) {
                         FloatingActionButton(onClick = { navController.navigate("maintenanceForm") }) {
-                            Icon(Icons.Filled.Add, contentDescription = "Add entry")
+                            Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add))
                         }
                     }
                 }
                 Navigation.INTERVALS.route -> {
                     if (vehicle != null) {
                         FloatingActionButton(onClick = { navController.navigate("intervalForm") }) {
-                            Icon(Icons.Filled.Add, contentDescription = "Add interval")
+                            Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add))
                         }
                     }
                 }
                 Navigation.COSTS.route ->{
                     if (vehicle != null) {
                         FloatingActionButton(onClick = { navController.navigate("refuelForm") }) {
-                            Icon(Icons.Filled.Add, contentDescription = "Add refuel")
+                            Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add))
                         }
                     }
                 }
@@ -324,10 +324,4 @@ fun AppNavigation(
     }
 }
 
-@Composable
-fun PlaceholderScreen(name: String) {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(name, style = MaterialTheme.typography.headlineMedium)
-    }
-}
 
