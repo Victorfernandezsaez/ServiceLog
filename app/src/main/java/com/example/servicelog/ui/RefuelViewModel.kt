@@ -30,22 +30,20 @@ class RefuelViewModel @Inject constructor(
     private val vehicleRepo: VehicleRepository
 ) : ViewModel() {
 
-    private val vehicleId = MutableStateFlow<Long?>(null)
-
-    val refuels: StateFlow<UiState<List<Refuel>>> = vehicleId
+    val refuels: StateFlow<UiState<List<Refuel>>> = vehicleRepo.observeVehicle()
         .filterNotNull()
-        .flatMapLatest { repo.observeRefuels(it) }
+        .flatMapLatest { repo.observeRefuels(it.id) }
         .map<List<Refuel>, UiState<List<Refuel>>> { UiState.Content(it) }
-        .catch { emit(UiState.Error(it.message ?: "Unknown error")) }
+        .catch { emit(UiState.Error("Unknown error")) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UiState.Loading)
 
-    val summary: StateFlow<UiState<CostSummary>> = vehicleId
+    val summary: StateFlow<UiState<CostSummary>> = vehicleRepo.observeVehicle()
         .filterNotNull()
-        .flatMapLatest { id ->
+        .flatMapLatest { vehicle ->
             combine(
-                repo.observeRefuels(id),
-                repo.observeMonthlyFuel(id),
-                maintenanceRepo.observeMonthlyMaintenance(id)
+                repo.observeRefuels(vehicle.id),
+                repo.observeMonthlyFuel(vehicle.id),
+                maintenanceRepo.observeMonthlyMaintenance(vehicle.id)
             ) { refuels, fuel, maintenance ->
                 CostSummary(
                     refuels = refuels,
@@ -57,10 +55,8 @@ class RefuelViewModel @Inject constructor(
             }
         }
         .map<CostSummary, UiState<CostSummary>> { UiState.Content(it) }
-        .catch { emit(UiState.Error(it.message ?: "Unknown error")) }
+        .catch { emit(UiState.Error("Unknown error")) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UiState.Loading)
-
-    fun setVehicle(id: Long) { vehicleId.value = id }
 
     fun save(refuel: Refuel) {
         viewModelScope.launch {

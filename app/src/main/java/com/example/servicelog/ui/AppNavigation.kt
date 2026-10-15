@@ -37,7 +37,6 @@ fun AppNavigation(
         vehicle?.id?.let {
             maintenanceViewModel.setVehicle(it)
             intervalViewModel.setVehicle(it)
-            refuelViewModel.setVehicle(it)
         }
     }
 
@@ -226,7 +225,6 @@ fun AppNavigation(
 
             composable(Navigation.COSTS.route) {
                 CostsScreen(
-                    summaryState = summaryState,
                     onRefuelClick = { navController.navigate("refuelForm/${it.id}") }
                 )
             }      }
