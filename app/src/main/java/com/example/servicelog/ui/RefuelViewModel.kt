@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.servicelog.data.MaintenanceRepository
 import com.example.servicelog.data.RefuelRepository
+import com.example.servicelog.data.VehicleRepository
 import com.example.servicelog.domain.CostSummary
 import com.example.servicelog.domain.Refuel
 import com.example.servicelog.domain.averageConsumption
@@ -21,12 +22,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class RefuelViewModel @Inject constructor(
     private val repo: RefuelRepository,
-    private val maintenanceRepo: MaintenanceRepository
+    private val maintenanceRepo: MaintenanceRepository,
+    private val vehicleRepo: VehicleRepository
 ) : ViewModel() {
 
     private val vehicleId = MutableStateFlow<Long?>(null)
@@ -61,7 +62,12 @@ class RefuelViewModel @Inject constructor(
 
     fun setVehicle(id: Long) { vehicleId.value = id }
 
-    fun save(refuel: Refuel) { viewModelScope.launch { repo.save(refuel) } }
+    fun save(refuel: Refuel) {
+        viewModelScope.launch {
+            repo.save(refuel)
+            vehicleRepo.updateMileageIfHigher(refuel.mileage, refuel.date)
+        }
+    }
 
     fun delete(refuel: Refuel) { viewModelScope.launch { repo.delete(refuel) } }
 }

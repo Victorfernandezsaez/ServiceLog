@@ -186,15 +186,7 @@ fun AppNavigation(
                 MaintenanceFormScreen(
                     entryToEdit = null,
                     vehicleId = vehicle?.id ?: 0,
-                    onSave = { entry ->
-                        maintenanceViewModel.save(entry)
-                        val km = entry.mileage
-                        val vehicle = vehicle
-                        if (km != null && vehicle != null && km > vehicle.currentKm) {
-                            viewModel.save(vehicle.copy(currentKm = km))
-                        }
-                        navController.popBackStack()
-                    },
+                    onSave = { maintenanceViewModel.save(it); navController.popBackStack() },
                     onCancel = { navController.popBackStack() }
                 )
             }
@@ -208,15 +200,7 @@ fun AppNavigation(
                 MaintenanceFormScreen(
                     entryToEdit = entry,
                     vehicleId = vehicle?.id ?: 0,
-                    onSave = { entry ->
-                        maintenanceViewModel.save(entry)
-                        val km = entry.mileage
-                        val vehicle = vehicle
-                        if (km != null && vehicle != null && km > vehicle.currentKm) {
-                            viewModel.save(vehicle.copy(currentKm = km))
-                        }
-                        navController.popBackStack()
-                    },
+                    onSave = { maintenanceViewModel.save(it); navController.popBackStack() },
                     onCancel = { navController.popBackStack() },
                     onDelete = {
                         entry?.let { maintenanceViewModel.delete(it) }
@@ -253,10 +237,7 @@ fun AppNavigation(
                 IntervalFormScreen(
                     intervalToEdit = interval,
                     vehicleId = vehicle?.id ?: 0,
-                    onSave = {
-                        intervalViewModel.save(it)
-                        navController.popBackStack()
-                    },
+                    onSave = { intervalViewModel.save(it); navController.popBackStack() },
                     onCancel = { navController.popBackStack() },
                     onDelete = {
                         interval?.let { intervalViewModel.delete(it) }
@@ -271,14 +252,7 @@ fun AppNavigation(
                     vehicleId = vehicle?.id ?: 0,
                     lastMileage = vehicle?.currentKm ?: 0,
                     tankCapacity = vehicle?.tankCapacity,
-                    onSave = {
-                        refuelViewModel.save(it)
-                        val vehicle = vehicle
-                        if (vehicle != null && it.mileage > vehicle.currentKm) {
-                            viewModel.save(vehicle.copy(currentKm = it.mileage, lastReadingDate = it.date))
-                        }
-                        navController.popBackStack()
-                    },
+                    onSave = { refuelViewModel.save(it); navController.popBackStack() },
                     onCancel = { navController.popBackStack() }
                 )
             }
