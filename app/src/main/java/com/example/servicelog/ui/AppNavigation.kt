@@ -158,7 +158,6 @@ fun AppNavigation(
 
             composable(Navigation.INTERVALS.route) {
                 IntervalsScreen(
-                    intervals = intervals,
                     onIntervalClick = { navController.navigate("intervalForm/${it.id}") },
                     onAddClick = { navController.navigate("intervalForm") }
                 )

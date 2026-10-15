@@ -2,6 +2,7 @@ package com.example.servicelog.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,26 +15,40 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.servicelog.R
 import com.example.servicelog.domain.MaintenanceInterval
 
 
 @Composable
 fun IntervalsScreen(
-    intervals: List<MaintenanceInterval>,
     onIntervalClick: (MaintenanceInterval) -> Unit,
-    onAddClick: () -> Unit
+    onAddClick: () -> Unit,
+    vm: IntervalsViewModel = hiltViewModel()
 ) {
+    val state by vm.uiState.collectAsStateWithLifecycle()
+
+    if (state.isLoading) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+        return
+    }
+
+    val intervals = state.intervals
 
     if (intervals.isEmpty()) {
         Column(
