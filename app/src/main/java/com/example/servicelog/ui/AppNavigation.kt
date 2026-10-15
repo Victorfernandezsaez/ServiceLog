@@ -126,7 +126,6 @@ fun AppNavigation(
 
             composable(Navigation.HISTORY.route) {
                 HistoryScreen(
-                    entries = entries,
                     onEntryClick = { navController.navigate("maintenanceForm/${it.id}") }
                 )
             }
