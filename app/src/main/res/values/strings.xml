@@ -59,6 +59,8 @@
     <string name="tank_capacity_label">Tank Capacity (Liters)</string>
     <string name="current_km_label">Current Km *</string>
     <string name="current_km_placeholder">e.g. 375529</string>
+    <string name="mileage_lower_warning">Lower than the current reading (%1$s km). Check the date or the mileage.</string>
+    <string name="current_km_hint">You can update this later from the home screen</string>
 
     <!-- intervals -->
     <string name="new_interval">New interval</string>

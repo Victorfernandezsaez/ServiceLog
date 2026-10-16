@@ -13,12 +13,24 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
 import com.example.servicelog.R
+import com.example.servicelog.ui.screens.CostsScreen
+import com.example.servicelog.ui.screens.FormScreen
+import com.example.servicelog.ui.screens.HistoryScreen
+import com.example.servicelog.ui.screens.HomeScreen
+import com.example.servicelog.ui.screens.IntervalFormScreen
+import com.example.servicelog.ui.screens.IntervalsScreen
+import com.example.servicelog.ui.screens.MaintenanceFormScreen
+import com.example.servicelog.ui.screens.RefuelFormScreen
+import com.example.servicelog.ui.uistate.UiState
+import com.example.servicelog.ui.viewModels.HomeViewModel
+import com.example.servicelog.ui.viewModels.IntervalViewModel
+import com.example.servicelog.ui.viewModels.RefuelViewModel
+import com.example.servicelog.ui.viewModels.VehicleViewModel
 import java.time.LocalDate
 
 @Composable
 fun AppNavigation(
     viewModel: VehicleViewModel = hiltViewModel(),
-    maintenanceViewModel: MaintenanceViewModel = hiltViewModel(),
     intervalViewModel: IntervalViewModel = hiltViewModel(),
     refuelViewModel: RefuelViewModel = hiltViewModel()
 ) {
@@ -26,16 +38,13 @@ fun AppNavigation(
     val refuels = (refuelsState as? UiState.Content)?.data ?: emptyList()
     val navController = rememberNavController()
     val vehicleState by viewModel.vehicle.collectAsStateWithLifecycle()
-    val entriesState by maintenanceViewModel.entries.collectAsStateWithLifecycle()
     val intervalsState by intervalViewModel.intervals.collectAsStateWithLifecycle()
 
     val vehicle = (vehicleState as? UiState.Content)?.data
-    val entries = (entriesState as? UiState.Content)?.data ?: emptyList()
     val intervals = (intervalsState as? UiState.Content)?.data ?: emptyList()
 
     LaunchedEffect(vehicle?.id) {
         vehicle?.id?.let {
-            maintenanceViewModel.setVehicle(it)
             intervalViewModel.setVehicle(it)
         }
     }
@@ -44,9 +53,10 @@ fun AppNavigation(
     val currentRoute = backStack?.destination?.route
     val showBar = Navigation.entries.any { it.route == currentRoute }
 
-    var showMileageDialog by remember { mutableStateOf(false) }
+    val homeVm: HomeViewModel = hiltViewModel()
+    val homeState by homeVm.uiState.collectAsStateWithLifecycle()
 
-    val summaryState by refuelViewModel.summary.collectAsStateWithLifecycle()
+    var showMileageDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -62,7 +72,12 @@ fun AppNavigation(
                                     launchSingleTop = true
                                 }
                             },
-                            icon = { Icon(dest.icon, contentDescription = stringResource(dest.labelRes)) },
+                            icon = {
+                                Icon(
+                                    dest.icon,
+                                    contentDescription = stringResource(dest.labelRes)
+                                )
+                            },
                             label = { Text(stringResource(dest.labelRes)) }
                         )
                     }
@@ -75,21 +90,32 @@ fun AppNavigation(
                 Navigation.HOME.route -> {
                     if (vehicle != null) {
                         FloatingActionButton(onClick = { navController.navigate("maintenanceForm") }) {
-                            Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add))
+                            Icon(
+                                Icons.Filled.Add,
+                                contentDescription = stringResource(R.string.add)
+                            )
                         }
                     }
                 }
+
                 Navigation.INTERVALS.route -> {
                     if (vehicle != null) {
                         FloatingActionButton(onClick = { navController.navigate("intervalForm") }) {
-                            Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add))
+                            Icon(
+                                Icons.Filled.Add,
+                                contentDescription = stringResource(R.string.add)
+                            )
                         }
                     }
                 }
-                Navigation.COSTS.route ->{
+
+                Navigation.COSTS.route -> {
                     if (vehicle != null) {
                         FloatingActionButton(onClick = { navController.navigate("refuelForm") }) {
-                            Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add))
+                            Icon(
+                                Icons.Filled.Add,
+                                contentDescription = stringResource(R.string.add)
+                            )
                         }
                     }
                 }
@@ -113,46 +139,25 @@ fun AppNavigation(
             }
 
             composable("vehicleForm") {
-                FormScreen(
-                    vehicleToEdit = vehicle,
-                    onSaveClick = {
-                        viewModel.save(it)
-                        navController.popBackStack()
-                    },
-                    onCancelClick = { navController.popBackStack() }
-                )
+                FormScreen(onDone = { navController.popBackStack() })
             }
 
             composable(Navigation.HISTORY.route) {
                 HistoryScreen(
-                    onEntryClick = { navController.navigate("maintenanceForm/${it.id}") }
-                )
-            }
-
-            composable("maintenanceForm") {
-                MaintenanceFormScreen(
-                    entryToEdit = null,
-                    vehicleId = vehicle?.id ?: 0,
-                    onSave = { maintenanceViewModel.save(it); navController.popBackStack() },
-                    onCancel = { navController.popBackStack() }
+                    onEntryClick = { navController.navigate("maintenanceForm?entryId=${it.id}") }
                 )
             }
 
             composable(
-                route = "maintenanceForm/{entryId}",
-                arguments = listOf(navArgument("entryId") { type = NavType.LongType })
-            ) { backStackEntry ->
-                val entryId = backStackEntry.arguments?.getLong("entryId") ?: 0L
-                val entry = entries.find { it.id == entryId }
+                route = "maintenanceForm?entryId={entryId}",
+                arguments = listOf(navArgument("entryId") {
+                    type = NavType.LongType
+                    defaultValue = 0L
+                })
+            ) {
                 MaintenanceFormScreen(
-                    entryToEdit = entry,
-                    vehicleId = vehicle?.id ?: 0,
-                    onSave = { maintenanceViewModel.save(it); navController.popBackStack() },
-                    onCancel = { navController.popBackStack() },
-                    onDelete = {
-                        entry?.let { maintenanceViewModel.delete(it) }
-                        navController.popBackStack()
-                    }                )
+                    onDone = { navController.popBackStack() }
+                )
             }
 
             composable(Navigation.INTERVALS.route) {
@@ -196,7 +201,7 @@ fun AppNavigation(
                 RefuelFormScreen(
                     refuelToEdit = null,
                     vehicleId = vehicle?.id ?: 0,
-                    lastMileage = vehicle?.currentKm ?: 0,
+                    lastMileage = homeState.currentKm ?: 0,
                     tankCapacity = vehicle?.tankCapacity,
                     onSave = { refuelViewModel.save(it); navController.popBackStack() },
                     onCancel = { navController.popBackStack() }
@@ -212,7 +217,7 @@ fun AppNavigation(
                 RefuelFormScreen(
                     refuelToEdit = refuel,
                     vehicleId = vehicle?.id ?: 0,
-                    lastMileage = vehicle?.currentKm ?: 0,
+                    lastMileage = homeState.currentKm ?: 0,
                     tankCapacity = vehicle?.tankCapacity,
                     onSave = { refuelViewModel.save(it); navController.popBackStack() },
                     onCancel = { navController.popBackStack() },
@@ -227,15 +232,15 @@ fun AppNavigation(
                 CostsScreen(
                     onRefuelClick = { navController.navigate("refuelForm/${it.id}") }
                 )
-            }      }
+            }
+        }
     }
 
-    val v = vehicle
-    if (showMileageDialog && v != null) {
+    if (showMileageDialog) {
         UpdateMileageDialog(
-            currentKm = v.currentKm,
+            currentKm = homeState.currentKm ?: 0,
             onConfirm = { km ->
-                viewModel.save(v.copy(currentKm = km, lastReadingDate = LocalDate.now()))
+                homeVm.addReading(km)
                 showMileageDialog = false
             },
             onDismiss = { showMileageDialog = false }

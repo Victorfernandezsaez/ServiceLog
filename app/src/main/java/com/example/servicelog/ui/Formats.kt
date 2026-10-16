@@ -12,7 +12,8 @@ import com.example.servicelog.domain.Urgency
 import com.example.servicelog.ui.theme.okGreenDark
 import com.example.servicelog.ui.theme.okGreenLight
 import com.example.servicelog.ui.theme.warningAmberDark
-import com.example.servicelog.ui.theme.warningAmberLight
+import com.example.servicelog.ui.theme.warningLight
+import com.example.servicelog.ui.theme.warningLight
 import java.text.NumberFormat
 import java.time.format.DateTimeFormatter
 import java.util.Currency
@@ -40,7 +41,7 @@ fun Urgency.color(): Color {
     val isDark = isSystemInDarkTheme()
     return when (this) {
         Urgency.OVERDUE -> MaterialTheme.colorScheme.error
-        Urgency.DUE_SOON -> if (isDark) warningAmberDark else warningAmberLight
+        Urgency.DUE_SOON -> if (isDark) warningAmberDark else warningLight
         Urgency.OK -> if (isDark) okGreenDark else okGreenLight
         Urgency.UNKNOWN -> MaterialTheme.colorScheme.outline
     }

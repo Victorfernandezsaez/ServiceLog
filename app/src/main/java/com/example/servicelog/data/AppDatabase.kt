@@ -6,6 +6,16 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.servicelog.data.daos.MaintenanceDao
+import com.example.servicelog.data.daos.MaintenanceIntervalDao
+import com.example.servicelog.data.daos.MileageDao
+import com.example.servicelog.data.daos.RefuelDao
+import com.example.servicelog.data.daos.VehicleDao
+import com.example.servicelog.data.entities.MaintenanceEntryEntity
+import com.example.servicelog.data.entities.MaintenanceIntervalEntity
+import com.example.servicelog.data.entities.MileageReadingEntity
+import com.example.servicelog.data.entities.RefuelEntity
+import com.example.servicelog.data.entities.VehicleEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -15,9 +25,10 @@ import kotlinx.coroutines.launch
         VehicleEntity::class,
         MaintenanceEntryEntity::class,
         RefuelEntity::class,
-        MaintenanceIntervalEntity::class
+        MaintenanceIntervalEntity::class,
+        MileageReadingEntity:: class
     ],
-    version = 6,
+    version = 7,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -29,6 +40,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun refuelDao(): RefuelDao
 
     abstract fun maintenanceIntervalDao(): MaintenanceIntervalDao
+
+    abstract fun mileageDao(): MileageDao
 
     companion object {
         @Volatile private var INSTANCE: AppDatabase? = null

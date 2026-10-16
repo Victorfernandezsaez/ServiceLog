@@ -1,5 +1,9 @@
 package com.example.servicelog.data
 
+import com.example.servicelog.data.entities.MaintenanceEntryEntity
+import com.example.servicelog.data.entities.MaintenanceIntervalEntity
+import com.example.servicelog.data.entities.MileageReadingEntity
+import com.example.servicelog.data.entities.VehicleEntity
 import com.example.servicelog.domain.Category
 import com.example.servicelog.domain.FuelType
 import com.example.servicelog.domain.VehicleType
@@ -16,8 +20,6 @@ suspend fun seed(db: AppDatabase) {
             year = 1996,
             fuelType = FuelType.DIESEL,
             tankCapacity = 80,
-            currentKm = 375529,
-            lastReadingDate = LocalDate.of(2026, 3, 10)
         )
     )
 
@@ -120,6 +122,14 @@ suspend fun seed(db: AppDatabase) {
 
     entries.forEach { db.maintenanceDao().save(it) }
     android.util.Log.d("Seed", "done: ${entries.size} entries")
+
+    db.mileageDao().insert(
+        MileageReadingEntity(
+            vehicleId = vehicleId,
+            date = LocalDate.of(2026, 3, 10),
+            mileage = 375529
+        )
+    )
 }
 
 suspend fun seedT4Intervals(db: AppDatabase, vehicleId: Long): Map<String, Long> {
