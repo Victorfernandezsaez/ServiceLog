@@ -304,7 +304,7 @@ fun FormScreen(
                     label = { Text(stringResource(R.string.tank_capacity_label)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = tankCapacityError,
-                    suffix = { Text("L") },
+                    suffix = { Text(stringResource(R.string.l_suffix)) },
                     supportingText = { if (tankCapacityError) Text(stringResource(R.string.only_numbers_error)) },
                     colors = customTextFieldColors,
                     modifier = Modifier.fillMaxWidth()
@@ -319,7 +319,7 @@ fun FormScreen(
                         },
                         label = { Text(stringResource(R.string.current_km_label)) },
                         placeholder = { Text(stringResource(R.string.current_km_placeholder)) },
-                        suffix = { Text("km") },
+                        suffix = { Text(stringResource(R.string.km_suffix)) },
                         supportingText = { Text(stringResource(R.string.current_km_hint)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         colors = customTextFieldColors,

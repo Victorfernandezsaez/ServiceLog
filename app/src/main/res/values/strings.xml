@@ -119,6 +119,12 @@
     <string name="in_km">"in %1$s km"</string>
     <string name="mileage_km_format">%1$s km</string>
 
+    <!-- suffix -->
+    <string name="km_suffix">km</string>
+    <string name="l_suffix">L</string>
+    <string name="eur_suffix">€</string>
+    <string name="month_suffix">mo</string>
+
     <!-- refuel -->
     <string name="new_refuel">New refuel</string>
     <string name="edit_refuel">Edit refuel</string>

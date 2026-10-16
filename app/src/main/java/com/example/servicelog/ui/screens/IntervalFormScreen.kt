@@ -158,7 +158,7 @@ fun IntervalFormScreen(
                     placeholder = { Text(stringResource(R.string.months_placeholder)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = intervalError,
-                    suffix = { Text("mo") },
+                    suffix = {Text(stringResource(R.string.month_suffix))},
                     singleLine = true,
                     modifier = Modifier.weight(1f)
                 )
@@ -208,7 +208,7 @@ fun IntervalFormScreen(
                 },
                 label = { Text(stringResource(R.string.mileage_km_label)) },
                 placeholder = { Text(stringResource(R.string.mileage_placeholder)) },
-                suffix = { Text("km") },
+                suffix = {Text(stringResource(R.string.km_suffix)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )

@@ -37,7 +37,6 @@ import com.example.servicelog.R
 import com.example.servicelog.ui.VehicleInfo
 import com.example.servicelog.ui.viewModels.HomeViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onAddClick: () -> Unit,
@@ -68,7 +67,8 @@ fun HomeScreen(
                     .fillMaxWidth()
                     .height(100.dp)
                     .clickable { onAddClick() },
-                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                shape = MaterialTheme.shapes.large,
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
             ) {
                 Row(

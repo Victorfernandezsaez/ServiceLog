@@ -203,7 +203,7 @@ fun MaintenanceFormScreen(
                     }
                 },
                 label = { Text(stringResource(R.string.mileage_km_label)) },
-                suffix = { Text("km") },
+                suffix = { Text(stringResource(R.string.km_suffix)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 isError = dateOrMileageError,
                 supportingText = {
@@ -234,7 +234,7 @@ fun MaintenanceFormScreen(
                 onValueChange = { cost = it },
                 label = { Text(stringResource(R.string.cost_label)) },
                 placeholder = { Text(stringResource(R.string.cost_placeholder)) },
-                suffix = { Text("€") },
+                suffix = { Text(stringResource(R.string.eur_suffix)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth()
             )

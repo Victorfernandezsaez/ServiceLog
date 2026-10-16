@@ -58,18 +58,22 @@ fun CostsScreen(
                 CircularProgressIndicator()
             }
         }
+
         is UiState.Error -> {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(stringResource(R.string.error_loading))
             }
         }
+
         is UiState.Content -> {
             val data = s.data
             val currentMonth = YearMonth.now().toString()
             val fuel = data.monthlyFuelCents[currentMonth] ?: 0
             val maintenance = data.monthlyMaintenanceCents[currentMonth] ?: 0
 
-            LazyColumn(Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
+            LazyColumn(Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)) {
                 item {
                     Spacer(Modifier.height(16.dp))
                     Row(
@@ -134,7 +138,20 @@ fun CostsScreen(
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
+
                             Spacer(Modifier.height(4.dp))
+
+                            data.lastStretch?.let {
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    stringResource(
+                                        R.string.last_tank_consumption,
+                                        costFormat.format(it.litersPer100Km)
+                                    ),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                             if (data.average != null) {
                                 Text(
                                     text = stringResource(
@@ -144,7 +161,9 @@ fun CostsScreen(
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold
                                 )
+
                                 Spacer(Modifier.width(4.dp))
+
                                 Text(
                                     text = stringResource(R.string.estimated_parentheses),
                                     style = MaterialTheme.typography.bodySmall,
@@ -180,7 +199,11 @@ fun CostsScreen(
                             shape = MaterialTheme.shapes.small
                         ) {
                             Text(
-                                text = pluralStringResource(R.plurals.entries_count, data.refuels.size, data.refuels.size),
+                                text = pluralStringResource(
+                                    R.plurals.entries_count,
+                                    data.refuels.size,
+                                    data.refuels.size
+                                ),
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer
