@@ -1,5 +1,7 @@
-package com.example.servicelog.data
+package com.example.servicelog.data.repositories
 
+import com.example.servicelog.data.daos.MaintenanceIntervalDao
+import com.example.servicelog.data.entities.MaintenanceIntervalEntity
 import com.example.servicelog.domain.MaintenanceInterval
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

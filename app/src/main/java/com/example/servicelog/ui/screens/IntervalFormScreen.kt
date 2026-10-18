@@ -1,4 +1,4 @@
-package com.example.servicelog.ui
+package com.example.servicelog.ui.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -16,13 +16,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,7 +32,6 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -51,7 +47,7 @@ import androidx.compose.ui.unit.dp
 import com.example.servicelog.R
 import com.example.servicelog.domain.Category
 import com.example.servicelog.domain.MaintenanceInterval
-import java.time.LocalDate
+import com.example.servicelog.ui.DateField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,7 +80,6 @@ fun IntervalFormScreen(
     var titleError by remember { mutableStateOf(false) }
     var intervalError by remember { mutableStateOf(false) }
     var showCategorySheet by remember { mutableStateOf(false) }
-    var showDatePicker by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -163,7 +158,7 @@ fun IntervalFormScreen(
                     placeholder = { Text(stringResource(R.string.months_placeholder)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = intervalError,
-                    suffix = { Text("km") },
+                    suffix = {Text(stringResource(R.string.month_suffix))},
                     singleLine = true,
                     modifier = Modifier.weight(1f)
                 )
@@ -202,18 +197,7 @@ fun IntervalFormScreen(
             )
             Spacer(Modifier.height(8.dp))
 
-            OutlinedTextField(
-                value = refDate?.format(dayFormatter) ?: "",
-                onValueChange = {},
-                readOnly = true,
-                label = { Text(stringResource(R.string.date_label)) },
-                trailingIcon = {
-                    IconButton(onClick = { showDatePicker = true }) {
-                        Icon(Icons.Filled.DateRange, contentDescription = stringResource(R.string.pick_date_desc))
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
+            DateField(date = refDate, onDateChange = { refDate = it })
 
             Spacer(Modifier.height(16.dp))
 
@@ -224,7 +208,7 @@ fun IntervalFormScreen(
                 },
                 label = { Text(stringResource(R.string.mileage_km_label)) },
                 placeholder = { Text(stringResource(R.string.mileage_placeholder)) },
-                suffix = { Text("km") },
+                suffix = {Text(stringResource(R.string.km_suffix)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -301,27 +285,6 @@ fun IntervalFormScreen(
                 )
             }
         }
-    }
-
-    if (showDatePicker) {
-        val state = rememberDatePickerState(
-            initialSelectedDateMillis = refDate?.toEpochDay()?.times(86_400_000)
-        )
-        DatePickerDialog(
-            onDismissRequest = { showDatePicker = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    state.selectedDateMillis?.let {
-                        refDate = LocalDate.ofEpochDay(it / 86_400_000)
-                    }
-                    showDatePicker = false
-                }) { Text(stringResource(R.string.ok)) }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) { Text(stringResource(R.string.cancel))}
-
-            }
-        ) { DatePicker(state = state) }
     }
 
     if (showDeleteDialog) {

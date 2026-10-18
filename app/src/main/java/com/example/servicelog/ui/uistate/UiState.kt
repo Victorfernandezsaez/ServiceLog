@@ -1,4 +1,4 @@
-package com.example.servicelog.ui
+package com.example.servicelog.ui.uistate
 
 sealed interface UiState<out T> {
     data object Loading : UiState<Nothing>

@@ -1,9 +1,11 @@
-package com.example.servicelog.data
+package com.example.servicelog.data.daos
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
+import com.example.servicelog.data.entities.MaintenanceEntryEntity
+import com.example.servicelog.data.MonthlyTotal
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -11,6 +13,9 @@ interface MaintenanceDao {
 
     @Query("SELECT * FROM maintenance_entry WHERE vehicleId = :vehicleId ORDER BY date DESC, mileage DESC")
     fun observeEntries(vehicleId: Long): Flow<List<MaintenanceEntryEntity>>
+
+    @Query("SELECT * FROM maintenance_entry WHERE id = :id LIMIT 1")
+    fun observeEntry(id: Long): Flow<MaintenanceEntryEntity?>
 
     @Query("""
         SELECT strftime('%Y-%m', date(date * 86400, 'unixepoch')) AS month,

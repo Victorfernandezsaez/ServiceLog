@@ -10,7 +10,7 @@ val OnPrimaryContainerLight = Color(0xFF001C38)
 
 val PrimaryDark = Color(0xFFA5C8FF)
 val OnPrimaryDark = Color(0xFF00315F)
-val PrimaryContainerDark = Color(0xFF004786)
+val PrimaryContainerDark = Color(0xFF292B33)
 val OnPrimaryContainerDark = Color(0xFFD3E4FF)
 
 // Secondary: #475569
@@ -90,8 +90,7 @@ val InversePrimaryDark = Color(0xFF1E3A5F)
 val ScrimDark = Color(0xFF000000)
 
 // Explicit warning/success colors
-val warningAmberLight = Color(0xFFE8A33D)
+val warningLight = Color(0xFFFF6700)
 val warningAmberDark = Color(0xFFFFB951)
-
 val okGreenLight = Color(0xFF3C8C4E)
 val okGreenDark = Color(0xFF53A866)

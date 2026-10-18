@@ -1,4 +1,4 @@
-package com.example.servicelog.data
+package com.example.servicelog.data.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -15,8 +15,5 @@ data class VehicleEntity(
     val model: String,
     val year: Int?,
     val fuelType: FuelType?,
-    val tankCapacity: Int?,
-    val currentKm: Int,
-    val lastReadingDate: LocalDate? = null
-
+    val tankCapacity: Int?
 )

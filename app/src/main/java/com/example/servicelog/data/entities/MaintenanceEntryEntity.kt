@@ -1,4 +1,4 @@
-package com.example.servicelog.data
+package com.example.servicelog.data.entities
 
 import androidx.room.*
 import com.example.servicelog.domain.Category

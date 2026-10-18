@@ -1,6 +1,7 @@
-package com.example.servicelog.data
+package com.example.servicelog.data.daos
 
 import androidx.room.*
+import com.example.servicelog.data.entities.VehicleEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -16,4 +17,5 @@ interface VehicleDao {
 
     @Insert
     suspend fun insertReturningId(vehicle: VehicleEntity): Long
+
 }

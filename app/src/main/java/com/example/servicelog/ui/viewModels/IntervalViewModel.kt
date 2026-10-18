@@ -1,9 +1,9 @@
-package com.example.servicelog.ui
-
+package com.example.servicelog.ui.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.servicelog.data.MaintenanceRepository
-import com.example.servicelog.domain.MaintenanceEntry
+import com.example.servicelog.data.repositories.IntervalRepository
+import com.example.servicelog.domain.MaintenanceInterval
+import com.example.servicelog.ui.uistate.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,23 +19,23 @@ import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
-class MaintenanceViewModel @Inject constructor(private val repo: MaintenanceRepository) : ViewModel() {
+class IntervalViewModel @Inject constructor(private val repo: IntervalRepository) : ViewModel() {
     private val vehicleId = MutableStateFlow<Long?>(null)
 
-    val entries: StateFlow<UiState<List<MaintenanceEntry>>> = vehicleId
+    val intervals: StateFlow<UiState<List<MaintenanceInterval>>> = vehicleId
         .filterNotNull()
-        .flatMapLatest { repo.observeEntries(it) }
-        .map<List<MaintenanceEntry>, UiState<List<MaintenanceEntry>>> { UiState.Content(it) }
+        .flatMapLatest { repo.observeIntervals(it) }
+        .map<List<MaintenanceInterval>, UiState<List<MaintenanceInterval>>> { UiState.Content(it) }
         .catch { emit(UiState.Error(it.message ?: "Unknown error")) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UiState.Loading)
 
     fun setVehicle(id: Long) { vehicleId.value = id }
 
-    fun save(entry: MaintenanceEntry) {
-        viewModelScope.launch { repo.save(entry) }
+    fun save(interval: MaintenanceInterval) {
+        viewModelScope.launch { repo.save(interval) }
     }
 
-    fun delete(entry: MaintenanceEntry) {
-        viewModelScope.launch { repo.delete(entry) }
+    fun delete(interval: MaintenanceInterval) {
+        viewModelScope.launch { repo.delete(interval) }
     }
 }

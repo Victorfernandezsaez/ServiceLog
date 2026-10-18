@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -34,34 +35,41 @@ import com.example.servicelog.R
 import com.example.servicelog.domain.DueStatus
 import com.example.servicelog.domain.Vehicle
 import com.example.servicelog.domain.icon
+import java.time.LocalDate
 
 @Composable
 fun VehicleInfo(
     vehicle: Vehicle,
+    currentKm: Int?,
+    lastReadingDate: LocalDate?,
     dueStatuses: List<DueStatus>,
-    onUpdateMileage: () -> Unit
+    onUpdateMileage: () -> Unit,
+    onEditVehicle: () -> Unit
 ) {
-
     var expanded by remember { mutableStateOf(false) }
     val visible = if (expanded) dueStatuses else dueStatuses.take(4)
 
-    Column(
-        modifier = Modifier.fillMaxWidth()
-    ) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+
         Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onEditVehicle() },
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            ),
             elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
             shape = MaterialTheme.shapes.large
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
+
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = vehicle.type.icon,
                         contentDescription = vehicle.type.label,
                         modifier = Modifier.size(32.dp)
                     )
-                    Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(Modifier.width(16.dp))
                     Column {
                         Text(
                             text = vehicle.alias,
@@ -77,21 +85,21 @@ fun VehicleInfo(
                         )
                     }
                 }
+
                 Spacer(Modifier.height(16.dp))
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column {
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            stringResource(
-                                R.string.mileage_km_format,
-                                numberFormat.format(vehicle.currentKm)
-                            ),
-                            style = MaterialTheme.typography.displaySmall
+                            text = currentKm?.let {
+                                stringResource(R.string.mileage_km_format, numberFormat.format(it))
+                            } ?: "—",
+                            style = MaterialTheme.typography.headlineMedium
                         )
-                        vehicle.lastReadingDate?.let {
+                        lastReadingDate?.let {
                             Text(
                                 stringResource(R.string.mileage_as_of, it.format(dayFormatter)),
                                 style = MaterialTheme.typography.bodySmall,
@@ -99,7 +107,12 @@ fun VehicleInfo(
                             )
                         }
                     }
-                    OutlinedButton(onClick = onUpdateMileage) {
+                    OutlinedButton(
+                        onClick = onUpdateMileage,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.tertiary
+                        )
+                    ) {
                         Text(stringResource(R.string.update))
                     }
                 }
@@ -113,6 +126,7 @@ fun VehicleInfo(
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(horizontal = 8.dp)
         )
+
         Spacer(Modifier.height(8.dp))
 
         if (dueStatuses.isEmpty()) {
@@ -162,16 +176,15 @@ fun VehicleInfo(
                     }
                 }
             }
+
             if (dueStatuses.size > 4) {
                 Box(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = if (expanded) stringResource(R.string.show_less) else stringResource(
-                            R.string.show_more,
-                            dueStatuses.size - 4
-                        ),
+                        text = if (expanded) stringResource(R.string.show_less)
+                        else stringResource(R.string.show_more, dueStatuses.size - 4),
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier

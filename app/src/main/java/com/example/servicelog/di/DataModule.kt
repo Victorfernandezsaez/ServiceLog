@@ -2,10 +2,11 @@ package com.example.servicelog.di
 
 import android.content.Context
 import com.example.servicelog.data.AppDatabase
-import com.example.servicelog.data.IntervalRepository
-import com.example.servicelog.data.MaintenanceRepository
-import com.example.servicelog.data.RefuelRepository
-import com.example.servicelog.data.VehicleRepository
+import com.example.servicelog.data.repositories.IntervalRepository
+import com.example.servicelog.data.repositories.MaintenanceRepository
+import com.example.servicelog.data.repositories.MileageRepository
+import com.example.servicelog.data.repositories.RefuelRepository
+import com.example.servicelog.data.repositories.VehicleRepository
 import javax.inject.Singleton
 import dagger.Module
 import dagger.Provides
@@ -27,6 +28,6 @@ object DataModule {
         MaintenanceRepository(db.maintenanceDao())
     @Provides fun provideIntervalRepo(db: AppDatabase) =
         IntervalRepository(db.maintenanceIntervalDao())
-
     @Provides fun provideRefuelRepo(db: AppDatabase) = RefuelRepository(db.refuelDao())
+    @Provides fun provideMileageRepo(db: AppDatabase) = MileageRepository(db.mileageDao())
 }

@@ -12,6 +12,4 @@ data class Vehicle(
     val year: Int?,
     val fuelType: FuelType?,
     val tankCapacity: Int?,
-    val currentKm: Int,
-    val lastReadingDate: LocalDate? = null
 )

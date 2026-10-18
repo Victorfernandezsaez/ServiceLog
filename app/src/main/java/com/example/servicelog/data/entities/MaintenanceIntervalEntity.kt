@@ -1,10 +1,11 @@
-package com.example.servicelog.data
+package com.example.servicelog.data.entities
 
 import androidx.room.*
+import com.example.servicelog.domain.Category
 import java.time.LocalDate
 
 @Entity(
-    tableName = "refuel",
+    tableName = "maintenance_interval",
     foreignKeys = [ForeignKey(
         entity = VehicleEntity::class,
         parentColumns = ["id"],
@@ -13,12 +14,14 @@ import java.time.LocalDate
     )],
     indices = [Index("vehicleId")]
 )
-data class RefuelEntity(
+data class MaintenanceIntervalEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val vehicleId: Long,
-    val date: LocalDate,
-    val mileage: Int,
-    val liters: Double,
-    val costCents: Int, // see MaintenanceEntry.costCents.
-    val fullTank: Boolean
-)
+    val title: String,
+    val category: Category,
+    val intervalMonths: Int?,
+    val intervalKm: Int?,
+    val referenceDate: LocalDate?,
+    val referenceMileage: Int?
+) {
+}

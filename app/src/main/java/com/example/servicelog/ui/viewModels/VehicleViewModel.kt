@@ -1,9 +1,10 @@
-package com.example.servicelog.ui
+package com.example.servicelog.ui.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.servicelog.data.VehicleRepository
+import com.example.servicelog.data.repositories.VehicleRepository
 import com.example.servicelog.domain.Vehicle
+import com.example.servicelog.ui.uistate.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted

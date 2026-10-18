@@ -1,5 +1,7 @@
-package com.example.servicelog.data
+package com.example.servicelog.data.repositories
 
+import com.example.servicelog.data.daos.RefuelDao
+import com.example.servicelog.data.entities.RefuelEntity
 import com.example.servicelog.domain.Refuel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

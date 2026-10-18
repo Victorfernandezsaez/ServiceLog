@@ -59,6 +59,8 @@
     <string name="tank_capacity_label">Tank Capacity (Liters)</string>
     <string name="current_km_label">Current Km *</string>
     <string name="current_km_placeholder">e.g. 375529</string>
+    <string name="mileage_lower_warning">Lower than the current reading (%1$s km). Check the date or the mileage.</string>
+    <string name="current_km_hint">You can update this later from the home screen</string>
 
     <!-- intervals -->
     <string name="new_interval">New interval</string>
@@ -116,6 +118,12 @@
     <string name="km_overdue">%1$s km overdue</string>
     <string name="in_km">"in %1$s km"</string>
     <string name="mileage_km_format">%1$s km</string>
+
+    <!-- suffix -->
+    <string name="km_suffix">km</string>
+    <string name="l_suffix">L</string>
+    <string name="eur_suffix">€</string>
+    <string name="month_suffix">mo</string>
 
     <!-- refuel -->
     <string name="new_refuel">New refuel</string>

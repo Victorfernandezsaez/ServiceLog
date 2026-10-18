@@ -1,4 +1,4 @@
-package com.example.servicelog.ui
+package com.example.servicelog.ui.screens
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
@@ -25,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,34 +33,47 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.servicelog.R
-import com.example.servicelog.domain.CostSummary
 import com.example.servicelog.domain.Refuel
+import com.example.servicelog.ui.uistate.UiState
+import com.example.servicelog.ui.costFormat
+import com.example.servicelog.ui.dayFormatter
+import com.example.servicelog.ui.moneyFormat
+import com.example.servicelog.ui.numberFormat
+import com.example.servicelog.ui.viewModels.RefuelViewModel
 import java.time.YearMonth
 
 @Composable
 fun CostsScreen(
-    summaryState: UiState<CostSummary>,
-    onRefuelClick: (Refuel) -> Unit
+    onRefuelClick: (Refuel) -> Unit,
+    vm: RefuelViewModel = hiltViewModel()
 ) {
+    val summaryState by vm.summary.collectAsStateWithLifecycle()
+
     when (val s = summaryState) {
         is UiState.Loading -> {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
         }
+
         is UiState.Error -> {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(stringResource(R.string.error_loading))
             }
         }
+
         is UiState.Content -> {
             val data = s.data
             val currentMonth = YearMonth.now().toString()
             val fuel = data.monthlyFuelCents[currentMonth] ?: 0
             val maintenance = data.monthlyMaintenanceCents[currentMonth] ?: 0
 
-            LazyColumn(Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
+            LazyColumn(Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)) {
                 item {
                     Spacer(Modifier.height(16.dp))
                     Row(
@@ -124,7 +138,20 @@ fun CostsScreen(
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
+
                             Spacer(Modifier.height(4.dp))
+
+                            data.lastStretch?.let {
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    stringResource(
+                                        R.string.last_tank_consumption,
+                                        costFormat.format(it.litersPer100Km)
+                                    ),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                             if (data.average != null) {
                                 Text(
                                     text = stringResource(
@@ -134,7 +161,9 @@ fun CostsScreen(
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold
                                 )
+
                                 Spacer(Modifier.width(4.dp))
+
                                 Text(
                                     text = stringResource(R.string.estimated_parentheses),
                                     style = MaterialTheme.typography.bodySmall,
@@ -170,7 +199,11 @@ fun CostsScreen(
                             shape = MaterialTheme.shapes.small
                         ) {
                             Text(
-                                text = pluralStringResource(R.plurals.entries_count, data.refuels.size, data.refuels.size),
+                                text = pluralStringResource(
+                                    R.plurals.entries_count,
+                                    data.refuels.size,
+                                    data.refuels.size
+                                ),
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer

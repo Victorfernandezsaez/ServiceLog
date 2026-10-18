@@ -1,4 +1,4 @@
-package com.example.servicelog.ui
+package com.example.servicelog.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -47,40 +47,54 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.servicelog.R
 import com.example.servicelog.domain.FuelType
 import com.example.servicelog.domain.Vehicle
 import com.example.servicelog.domain.VehicleType
 import com.example.servicelog.domain.icon
+import com.example.servicelog.ui.viewModels.VehicleFormViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicleToEdit: Vehicle?) {
+fun FormScreen(
+    onDone: () -> Unit,
+    vm: VehicleFormViewModel = hiltViewModel()
+) {
+    val vehicleToEdit by vm.vehicle.collectAsStateWithLifecycle()
+
     var alias by rememberSaveable(vehicleToEdit) { mutableStateOf(vehicleToEdit?.alias ?: "") }
     var brand by rememberSaveable(vehicleToEdit) { mutableStateOf(vehicleToEdit?.brand ?: "") }
     var model by rememberSaveable(vehicleToEdit) { mutableStateOf(vehicleToEdit?.model ?: "") }
-    var year by rememberSaveable(vehicleToEdit) { mutableStateOf(vehicleToEdit?.year?.toString() ?: "") }
-    var selectedFuelType by rememberSaveable(vehicleToEdit) { mutableStateOf(vehicleToEdit?.fuelType) }
-    var tankCapacity by rememberSaveable(vehicleToEdit) { mutableStateOf(vehicleToEdit?.tankCapacity?.toString() ?: "") }
-    var currentKm by rememberSaveable(vehicleToEdit) { mutableStateOf(vehicleToEdit?.currentKm?.toString() ?: "") }
+    var year by rememberSaveable(vehicleToEdit) {
+        mutableStateOf(vehicleToEdit?.year?.toString() ?: "")
+    }
+    var selectedFuelType by rememberSaveable(vehicleToEdit) {
+        mutableStateOf(vehicleToEdit?.fuelType)
+    }
+    var tankCapacity by rememberSaveable(vehicleToEdit) {
+        mutableStateOf(vehicleToEdit?.tankCapacity?.toString() ?: "")
+    }
+    var currentKm by rememberSaveable { mutableStateOf("") }
+    var selectedType by rememberSaveable(vehicleToEdit) {
+        mutableStateOf(vehicleToEdit?.type ?: VehicleType.CAR)
+    }
 
     var fuelMenuExpanded by remember { mutableStateOf(false) }
+    var vehicleMenuExpanded by remember { mutableStateOf(false) }
 
     var brandError by remember { mutableStateOf(false) }
     var modelError by remember { mutableStateOf(false) }
     var yearError by remember { mutableStateOf(false) }
     var tankCapacityError by remember { mutableStateOf(false) }
-    var currentKmError by remember { mutableStateOf(false) }
 
-    var vehicleMenuExpanded by remember { mutableStateOf(false) }
-    var selectedType by rememberSaveable(vehicleToEdit) {
-        mutableStateOf(vehicleToEdit?.type ?: VehicleType.CAR)
-    }
     val customTextFieldColors = OutlinedTextFieldDefaults.colors(
         focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
         unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
         errorContainerColor = MaterialTheme.colorScheme.errorContainer
     )
+
     Scaffold(
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
@@ -94,11 +108,16 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.primaryContainer, shape = RoundedCornerShape(16.dp))
+                    .background(
+                        MaterialTheme.colorScheme.primaryContainer,
+                        shape = RoundedCornerShape(16.dp)
+                    )
             ) {
                 IconButton(
-                    onClick = onCancelClick,
-                    modifier = Modifier.align(Alignment.TopStart).padding(16.dp)
+                    onClick = onDone,
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(16.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
@@ -107,7 +126,9 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                     )
                 }
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 70.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 70.dp),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -126,6 +147,7 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                     )
                 }
             }
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -143,9 +165,7 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                         readOnly = true,
                         label = { Text(stringResource(R.string.vehicle_type_label)) },
                         colors = customTextFieldColors,
-                        leadingIcon = {
-                            Icon(selectedType.icon, contentDescription = null)
-                        },
+                        leadingIcon = { Icon(selectedType.icon, contentDescription = null) },
                         trailingIcon = {
                             ExposedDropdownMenuDefaults.TrailingIcon(expanded = vehicleMenuExpanded)
                         },
@@ -192,12 +212,14 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                     isError = brandError,
                     supportingText = {
                         if (brandError) {
-                            Text(stringResource(R.string.field_required), color = MaterialTheme.colorScheme.error)
+                            Text(
+                                stringResource(R.string.field_required),
+                                color = MaterialTheme.colorScheme.error
+                            )
                         }
                     },
                     colors = customTextFieldColors,
                     modifier = Modifier.fillMaxWidth()
-
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -210,7 +232,10 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                     isError = modelError,
                     supportingText = {
                         if (modelError) {
-                            Text(stringResource(R.string.field_required), color = MaterialTheme.colorScheme.error)
+                            Text(
+                                stringResource(R.string.field_required),
+                                color = MaterialTheme.colorScheme.error
+                            )
                         }
                     },
                     colors = customTextFieldColors,
@@ -279,29 +304,28 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                     label = { Text(stringResource(R.string.tank_capacity_label)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = tankCapacityError,
-                    suffix = { Text("L") },
-                    supportingText = { if (tankCapacityError) Text(stringResource(R.string.only_numbers)) },
+                    suffix = { Text(stringResource(R.string.l_suffix)) },
+                    supportingText = { if (tankCapacityError) Text(stringResource(R.string.only_numbers_error)) },
                     colors = customTextFieldColors,
                     modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(modifier = Modifier.height(16.dp))
 
-                OutlinedTextField(
-                    value = currentKm,
-                    onValueChange = { input ->
-                        if (input.all { it.isDigit() }) {
-                            currentKm = input; currentKmError = false
-                        }
-                    },
-                    label = { Text(stringResource(R.string.current_km_label)) },
-                    placeholder = { Text(stringResource(R.string.current_km_placeholder)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    isError = currentKmError,
-                    suffix = { Text("km") },
-                    supportingText = { if (currentKmError) Text(stringResource(R.string.only_numbers_error)) },
-                    colors = customTextFieldColors,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                if (vehicleToEdit == null) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    OutlinedTextField(
+                        value = currentKm,
+                        onValueChange = { input ->
+                            if (input.all { it.isDigit() }) currentKm = input
+                        },
+                        label = { Text(stringResource(R.string.current_km_label)) },
+                        placeholder = { Text(stringResource(R.string.current_km_placeholder)) },
+                        suffix = { Text(stringResource(R.string.km_suffix)) },
+                        supportingText = { Text(stringResource(R.string.current_km_hint)) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        colors = customTextFieldColors,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(32.dp))
 
@@ -311,7 +335,7 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     OutlinedButton(
-                        onClick = { onCancelClick() },
+                        onClick = onDone,
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(stringResource(R.string.cancel))
@@ -325,7 +349,6 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                             modelError = false
                             yearError = false
                             tankCapacityError = false
-                            currentKmError = false
 
                             var hasValidationError = false
 
@@ -340,7 +363,6 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
 
                             val yearNum = year.toIntOrNull()
                             val tankNum = tankCapacity.toIntOrNull()
-                            val kmNum = currentKm.toIntOrNull()
 
                             if (year.isNotBlank() && yearNum == null) {
                                 yearError = true
@@ -350,13 +372,9 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                                 tankCapacityError = true
                                 hasValidationError = true
                             }
-                            if (currentKm.isBlank() || kmNum == null) {
-                                currentKmError = true
-                                hasValidationError = true
-                            }
 
                             if (!hasValidationError) {
-                                onSaveClick(
+                                vm.save(
                                     Vehicle(
                                         id = vehicleToEdit?.id ?: 0,
                                         type = selectedType,
@@ -365,10 +383,11 @@ fun FormScreen(onSaveClick: (Vehicle) -> Unit, onCancelClick: () -> Unit, vehicl
                                         model = model,
                                         year = yearNum,
                                         fuelType = selectedFuelType,
-                                        tankCapacity = tankNum,
-                                        currentKm = kmNum ?: 0,
-                                    )
+                                        tankCapacity = tankNum
+                                    ),
+                                    initialMileage = currentKm.toIntOrNull()
                                 )
+                                onDone()
                             }
                         },
                         modifier = Modifier.weight(1f),

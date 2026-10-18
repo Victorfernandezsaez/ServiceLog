@@ -1,4 +1,4 @@
-package com.example.servicelog.ui
+package com.example.servicelog.ui.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,15 +13,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,7 +26,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,9 +39,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.servicelog.R
 import com.example.servicelog.domain.Refuel
+import com.example.servicelog.ui.DateField
+import com.example.servicelog.ui.costFormat
 import java.time.LocalDate
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RefuelFormScreen(
     refuelToEdit: Refuel?,
@@ -76,7 +72,6 @@ fun RefuelFormScreen(
     var mileageError by remember { mutableStateOf<Int?>(null) }
     var litersError by remember { mutableStateOf<Int?>(null) }
     var costError by remember { mutableStateOf(false) }
-    var showDatePicker by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     Scaffold { innerPadding ->
@@ -105,28 +100,19 @@ fun RefuelFormScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            OutlinedTextField(
-                value = date.format(dayFormatter),
-                onValueChange = {},
-                readOnly = true,
-                label = { Text(stringResource(R.string.date_label)) },
-                trailingIcon = {
-                    IconButton(onClick = { showDatePicker = true }) {
-                        Icon(Icons.Filled.DateRange, contentDescription = stringResource(R.string.pick_date_desc))
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
+            DateField(date = date, onDateChange = { date = it })
 
             Spacer(Modifier.height(16.dp))
 
             OutlinedTextField(
                 value = mileage,
                 onValueChange = { input ->
-                    if (input.all { it.isDigit() }) { mileage = input; mileageError = null }
+                    if (input.all { it.isDigit() }) {
+                        mileage = input; mileageError = null
+                    }
                 },
                 label = { Text(stringResource(R.string.mileage_km_label)) },
-                suffix = { Text("km") },
+                suffix = { Text(stringResource(R.string.km_suffix)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 isError = mileageError != null,
                 supportingText = { mileageError?.let { Text(stringResource(it)) } },
@@ -141,7 +127,7 @@ fun RefuelFormScreen(
                 onValueChange = { liters = it; litersError = null },
                 label = { Text(stringResource(R.string.liters_label)) },
                 placeholder = { Text(stringResource(R.string.liters_placeholder)) },
-                suffix = { Text("L") },
+                suffix = { Text(stringResource(R.string.l_suffix)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 isError = litersError != null,
                 supportingText = { litersError?.let { Text(stringResource(it)) } },
@@ -156,7 +142,7 @@ fun RefuelFormScreen(
                 onValueChange = { cost = it; costError = false },
                 label = { Text(stringResource(R.string.cost_label)) },
                 placeholder = { Text(stringResource(R.string.cost_placeholder)) },
-                suffix = { Text("€") },
+                suffix = { Text(stringResource(R.string.eur_suffix)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 isError = costError,
                 supportingText = { if (costError) Text(stringResource(R.string.error_enter_a_number)) },
@@ -196,12 +182,14 @@ fun RefuelFormScreen(
                             mileageNum == null -> R.string.error_enter_a_number
                             refuelToEdit == null && mileageNum < lastMileage ->
                                 R.string.error_cannot_be_lower_than_last_reading
+
                             else -> null
                         }
                         litersError = when {
                             litersNum == null || litersNum <= 0 -> R.string.error_enter_litres
                             tankCapacity != null && litersNum > tankCapacity * 1.1 ->
                                 R.string.error_more_than_tank_holds
+
                             else -> null
                         }
                         costError = costCents == null
@@ -247,24 +235,6 @@ fun RefuelFormScreen(
         }
     }
 
-    if (showDatePicker) {
-        val state = rememberDatePickerState(
-            initialSelectedDateMillis = date.toEpochDay() * 86_400_000
-        )
-        DatePickerDialog(
-            onDismissRequest = { showDatePicker = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    state.selectedDateMillis?.let { date = LocalDate.ofEpochDay(it / 86_400_000) }
-                    showDatePicker = false
-                }) { Text(stringResource(R.string.ok)) }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) { Text(stringResource(R.string.cancel)) }
-            }
-        ) { DatePicker(state = state) }
-    }
-
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
@@ -279,7 +249,9 @@ fun RefuelFormScreen(
                 ) { Text(stringResource(R.string.delete)) }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) { Text(stringResource(R.string.cancel)) }
+                TextButton(onClick = {
+                    showDeleteDialog = false
+                }) { Text(stringResource(R.string.cancel)) }
             }
         )
     }

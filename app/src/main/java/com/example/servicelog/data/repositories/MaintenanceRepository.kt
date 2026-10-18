@@ -1,5 +1,7 @@
-package com.example.servicelog.data
+package com.example.servicelog.data.repositories
 
+import com.example.servicelog.data.daos.MaintenanceDao
+import com.example.servicelog.data.entities.MaintenanceEntryEntity
 import com.example.servicelog.domain.MaintenanceEntry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -8,6 +10,9 @@ class MaintenanceRepository(private val dao: MaintenanceDao) {
 
     fun observeEntries(vehicleId: Long): Flow<List<MaintenanceEntry>> =
         dao.observeEntries(vehicleId).map { list -> list.map { it.toDomain() } }
+
+    fun observeEntry(id: Long): Flow<MaintenanceEntry?> =
+        dao.observeEntry(id).map { it?.toDomain() }
 
     suspend fun save(entry: MaintenanceEntry) = dao.save(entry.toEntity())
 
