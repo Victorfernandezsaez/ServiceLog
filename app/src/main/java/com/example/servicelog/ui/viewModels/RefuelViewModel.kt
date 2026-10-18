@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -38,24 +39,27 @@ class RefuelViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UiState.Loading)
 
     val summary: StateFlow<UiState<CostSummary>> = vehicleRepo.observeVehicle()
-        .filterNotNull()
         .flatMapLatest { vehicle ->
-            combine(
-                repo.observeRefuels(vehicle.id),
-                repo.observeMonthlyFuel(vehicle.id),
-                maintenanceRepo.observeMonthlyMaintenance(vehicle.id)
-            ) { refuels, fuel, maintenance ->
-                CostSummary(
-                    refuels = refuels,
-                    monthlyFuelCents = fuel,
-                    monthlyMaintenanceCents = maintenance,
-                    average = averageConsumption(refuels),
-                    lastStretch = lastStretchConsumption(refuels)
-                )
+            if (vehicle == null) {
+                flowOf(CostSummary(emptyList(), emptyMap(), emptyMap(), null, null))
+            } else {
+                combine(
+                    repo.observeRefuels(vehicle.id),
+                    repo.observeMonthlyFuel(vehicle.id),
+                    maintenanceRepo.observeMonthlyMaintenance(vehicle.id)
+                ) { refuels, fuel, maintenance ->
+                    CostSummary(
+                        refuels = refuels,
+                        monthlyFuelCents = fuel,
+                        monthlyMaintenanceCents = maintenance,
+                        average = averageConsumption(refuels),
+                        lastStretch = lastStretchConsumption(refuels)
+                    )
+                }
             }
         }
         .map<CostSummary, UiState<CostSummary>> { UiState.Content(it) }
-        .catch { emit(UiState.Error("Unknown error")) }
+        .catch { emit(UiState.Error(it.message ?: "Unknown error")) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UiState.Loading)
 
     fun save(entry: Refuel) {

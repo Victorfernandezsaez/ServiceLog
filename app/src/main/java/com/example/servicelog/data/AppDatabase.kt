@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
         MaintenanceIntervalEntity::class,
         MileageReadingEntity:: class
     ],
-    version = 7,
+    version = 8,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
