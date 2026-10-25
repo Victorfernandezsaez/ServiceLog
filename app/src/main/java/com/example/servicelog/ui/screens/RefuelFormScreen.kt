@@ -18,6 +18,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +27,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,6 +46,7 @@ import com.example.servicelog.ui.DateField
 import com.example.servicelog.ui.costFormat
 import java.time.LocalDate
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RefuelFormScreen(
     refuelToEdit: Refuel?,
@@ -74,7 +78,26 @@ fun RefuelFormScreen(
     var costError by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
 
-    Scaffold { innerPadding ->
+    Scaffold(
+    topBar = {
+        TopAppBar(
+            title = {
+                Text(stringResource(
+                    if (refuelToEdit == null) R.string.new_refuel else R.string.edit_refuel
+                ))
+            },
+            navigationIcon = {
+                IconButton(onClick = onCancel) {
+                    Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cancel))
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer
+            )
+        )
+    }
+    )
+    { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -83,23 +106,6 @@ fun RefuelFormScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = onCancel, modifier = Modifier.padding(end = 8.dp)) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = stringResource(R.string.cancel)
-                    )
-                }
-                Text(
-                    text = stringResource(
-                        if (refuelToEdit == null) R.string.new_refuel else R.string.edit_refuel
-                    ),
-                    style = MaterialTheme.typography.headlineSmall
-                )
-            }
-
-            Spacer(Modifier.height(24.dp))
-
             DateField(date = date, onDateChange = { date = it })
 
             Spacer(Modifier.height(16.dp))

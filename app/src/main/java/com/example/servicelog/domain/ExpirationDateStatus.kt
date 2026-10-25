@@ -9,6 +9,7 @@ data class DueStatus(
     val urgency: Urgency,
     val dueDate: LocalDate?,
     val monthsLeft: Long?,
+    val daysLeft: Long?,
     val kmLeft: Int?,
     val lastDate: LocalDate?,
     val lastMileage: Int?

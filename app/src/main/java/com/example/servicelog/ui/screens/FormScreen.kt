@@ -1,8 +1,6 @@
 package com.example.servicelog.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,10 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -31,9 +27,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,10 +40,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.servicelog.R
@@ -89,14 +84,23 @@ fun FormScreen(
     var yearError by remember { mutableStateOf(false) }
     var tankCapacityError by remember { mutableStateOf(false) }
 
-    val customTextFieldColors = OutlinedTextFieldDefaults.colors(
-        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-        errorContainerColor = MaterialTheme.colorScheme.errorContainer
-    )
-
     Scaffold(
-        modifier = Modifier.fillMaxSize()
+        topBar = {
+            TopAppBar(
+                title = {Text(stringResource(R.string.about_your_vehicle, selectedType.label))},
+                navigationIcon = {
+                    IconButton(onClick = onDone) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = stringResource(R.string.cancel)
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                )
+            )
+        }
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -105,56 +109,11 @@ fun FormScreen(
                 .imePadding()
                 .verticalScroll(rememberScrollState())
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        MaterialTheme.colorScheme.primaryContainer,
-                        shape = RoundedCornerShape(16.dp)
-                    )
-            ) {
-                IconButton(
-                    onClick = onDone,
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(16.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = stringResource(R.string.cancel),
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 70.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = selectedType.icon,
-                        contentDescription = selectedType.label,
-                        modifier = Modifier.size(40.dp),
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(R.string.about_your_vehicle, selectedType.label),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
-            }
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                Spacer(modifier = Modifier.height(32.dp))
-
                 ExposedDropdownMenuBox(
                     expanded = vehicleMenuExpanded,
                     onExpandedChange = { vehicleMenuExpanded = it }
@@ -164,7 +123,6 @@ fun FormScreen(
                         onValueChange = {},
                         readOnly = true,
                         label = { Text(stringResource(R.string.vehicle_type_label)) },
-                        colors = customTextFieldColors,
                         leadingIcon = { Icon(selectedType.icon, contentDescription = null) },
                         trailingIcon = {
                             ExposedDropdownMenuDefaults.TrailingIcon(expanded = vehicleMenuExpanded)
@@ -198,7 +156,6 @@ fun FormScreen(
                     onValueChange = { alias = it },
                     label = { Text(stringResource(R.string.alias_label)) },
                     placeholder = { Text(stringResource(R.string.alias_placeholder)) },
-                    colors = customTextFieldColors,
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -218,7 +175,6 @@ fun FormScreen(
                             )
                         }
                     },
-                    colors = customTextFieldColors,
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -238,7 +194,6 @@ fun FormScreen(
                             )
                         }
                     },
-                    colors = customTextFieldColors,
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -252,7 +207,6 @@ fun FormScreen(
                     isError = yearError,
                     supportingText = { if (yearError) Text(stringResource(R.string.only_numbers_error)) },
                     placeholder = { Text(stringResource(R.string.year_placeholder)) },
-                    colors = customTextFieldColors,
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -268,7 +222,6 @@ fun FormScreen(
                         readOnly = true,
                         label = { Text(stringResource(R.string.fuel_type_label)) },
                         placeholder = { Text(stringResource(R.string.fuel_type_placeholder)) },
-                        colors = customTextFieldColors,
                         trailingIcon = {
                             ExposedDropdownMenuDefaults.TrailingIcon(expanded = fuelMenuExpanded)
                         },
@@ -306,7 +259,6 @@ fun FormScreen(
                     isError = tankCapacityError,
                     suffix = { Text(stringResource(R.string.l_suffix)) },
                     supportingText = { if (tankCapacityError) Text(stringResource(R.string.only_numbers_error)) },
-                    colors = customTextFieldColors,
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -322,12 +274,9 @@ fun FormScreen(
                         suffix = { Text(stringResource(R.string.km_suffix)) },
                         supportingText = { Text(stringResource(R.string.current_km_hint)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        colors = customTextFieldColors,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
-
-                Spacer(modifier = Modifier.height(32.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),

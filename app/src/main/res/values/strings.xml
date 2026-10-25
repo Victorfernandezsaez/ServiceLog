@@ -47,7 +47,6 @@
     <string name="model_placeholder">e.g. Fiesta, Golf</string>
     <string name="year_label">Year of fabrication</string>
     <string name="only_numbers_error">Only numbers in this field</string>
-    <string name="only_numbers">Only numbers in this field</string>
     <string name="year_placeholder">e.g. 2016</string>
     <string name="fuel_type_label">Type of fuel</string>
     <string name="fuel_type_placeholder">Select fuel type</string>
@@ -110,7 +109,7 @@
     <string name="scheduled_rules">SCHEDULED RULES</string>
     <string name="every_km">every %1$s km</string>
     <string name="no_interval_set">No interval set</string>
-    <string name="interval_separator"> or </string>
+    <string name="interval_separator">" or "</string>
     <string name="delete_interval">Delete interval</string>
     <string name="delete_interval_title">Delete this interval?</string>
 
@@ -138,7 +137,6 @@
     <string name="fuel">Fuel</string>
     <string name="maintenance">Maintenance</string>
     <string name="recent_refuels">Recent refuels</string>
-    <string name="average_consumption">Average consumption: %1$s L/100km (estimated)</string>
     <string name="last_tank_consumption">Last tank: %1$s L/100km</string>
     <string name="not_enough_refuels">Not enough refuels yet to estimate consumption</string>
     <string name="total_expenses">Total expenses</string>
@@ -164,4 +162,11 @@
         <item quantity="one">%d entry</item>
         <item quantity="other">%d entries</item>
     </plurals>
+
+    <!-- notification -->
+    <string name="channel_due_name">Service reminders</string>
+    <string name="channel_due_description">Reminds you before a scheduled service is due</string>
+    <string name="due_in_a_week">Due in a week</string>
+    <string name="due_tomorrow">Due tomorrow</string>
+
 </resources>

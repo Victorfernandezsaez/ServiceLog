@@ -80,6 +80,7 @@ fun calculateDue(
         urgency = urgency,
         dueDate = dueDate,
         monthsLeft = monthsLeft,
+        daysLeft = daysLeft,
         kmLeft = kmLeft,
         lastDate = usedDate,
         lastMileage = usedKm

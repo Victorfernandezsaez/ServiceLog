@@ -13,7 +13,6 @@ import com.example.servicelog.ui.theme.okGreenDark
 import com.example.servicelog.ui.theme.okGreenLight
 import com.example.servicelog.ui.theme.warningAmberDark
 import com.example.servicelog.ui.theme.warningLight
-import com.example.servicelog.ui.theme.warningLight
 import java.text.NumberFormat
 import java.time.format.DateTimeFormatter
 import java.util.Currency

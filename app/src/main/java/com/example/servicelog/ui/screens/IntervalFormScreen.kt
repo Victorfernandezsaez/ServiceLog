@@ -32,6 +32,8 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,7 +41,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -84,7 +85,25 @@ fun IntervalFormScreen(
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    Scaffold { innerPadding ->
+    Scaffold (
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(stringResource(
+                        if (intervalToEdit == null) R.string.new_interval else R.string.edit_interval
+                    ))
+                },
+                navigationIcon = {
+                    IconButton(onClick = onCancel) {
+                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cancel))
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                )
+            )
+        }
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -93,21 +112,6 @@ fun IntervalFormScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = onCancel, modifier = Modifier.padding(end = 8.dp)) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = stringResource(R.string.cancel)
-                    )
-                }
-                Text(
-                    text = if (intervalToEdit == null) stringResource(R.string.new_interval) else stringResource(R.string.edit_interval),
-                    style = MaterialTheme.typography.headlineSmall
-                )
-            }
-
-            Spacer(Modifier.height(24.dp))
-
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it; titleError = false },
@@ -164,7 +168,7 @@ fun IntervalFormScreen(
                 )
                 Spacer(Modifier.width(16.dp))
                 OutlinedTextField(
-                    value = km,
+                    value = R.string.km_suffix.toString() ,
                     onValueChange = { input ->
                         if (input.all { it.isDigit() }) { km = input; intervalError = false }
                     },
