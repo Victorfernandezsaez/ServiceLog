@@ -16,13 +16,13 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class RefuelViewModel @Inject constructor(
@@ -32,10 +32,12 @@ class RefuelViewModel @Inject constructor(
 ) : ViewModel() {
 
     val refuels: StateFlow<UiState<List<Refuel>>> = vehicleRepo.observeVehicle()
-        .filterNotNull()
-        .flatMapLatest { repo.observeRefuels(it.id) }
+        .flatMapLatest { vehicle ->
+            if (vehicle == null) flowOf(emptyList())
+            else repo.observeRefuels(vehicle.id)
+        }
         .map<List<Refuel>, UiState<List<Refuel>>> { UiState.Content(it) }
-        .catch { emit(UiState.Error("Unknown error")) }
+        .catch { emit(UiState.Error(it.message ?: "Unknown error")) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UiState.Loading)
 
     val summary: StateFlow<UiState<CostSummary>> = vehicleRepo.observeVehicle()

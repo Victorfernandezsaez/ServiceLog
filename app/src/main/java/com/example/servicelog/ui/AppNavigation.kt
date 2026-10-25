@@ -14,7 +14,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -63,11 +62,6 @@ fun AppNavigation(
     val vehicle = (vehicleState as? UiState.Content)?.data
     val intervals = (intervalsState as? UiState.Content)?.data ?: emptyList()
 
-    LaunchedEffect(vehicle?.id) {
-        vehicle?.id?.let {
-            intervalViewModel.setVehicle(it)
-        }
-    }
 
     val backStack by navController.currentBackStackEntryAsState()
     val currentRoute = backStack?.destination?.route
