@@ -120,13 +120,13 @@ fun MaintenanceFormScreen(
 
     var mileageWarning by remember { mutableStateOf(false) }
 
-    LaunchedEffect(date, mileage) {
+    LaunchedEffect(date, mileage, uiState) {
         val km = mileage.toIntOrNull()
         val currentKm = uiState.currentKm
         val lastDate = uiState.lastReadingDate
-        val date = date
+        val d = date
         mileageWarning = km != null && currentKm != null && km < currentKm &&
-                (lastDate == null || date == null || !date.isBefore(lastDate))
+                (lastDate == null || d == null || !d.isBefore(lastDate))
     }
 
     Scaffold(
