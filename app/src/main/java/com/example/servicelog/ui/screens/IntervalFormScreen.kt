@@ -176,7 +176,7 @@ fun IntervalFormScreen(
                     placeholder = { Text(stringResource(R.string.km_placeholder)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = intervalError,
-                    suffix = { Text("km") },
+                    suffix = { Text(stringResource(R.string.km_suffix)) },
                     singleLine = true,
                     modifier = Modifier.weight(1f)
                 )
