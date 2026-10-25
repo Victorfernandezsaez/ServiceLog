@@ -168,7 +168,7 @@ fun IntervalFormScreen(
                 )
                 Spacer(Modifier.width(16.dp))
                 OutlinedTextField(
-                    value = R.string.km_suffix.toString() ,
+                    value = km,
                     onValueChange = { input ->
                         if (input.all { it.isDigit() }) { km = input; intervalError = false }
                     },
